@@ -20,7 +20,7 @@ const Home = () => {
     },
     {
         id: '2',
-        companyLogo: 'https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg',
+        companyLogo: null,
         jobTitle: 'UI/UX Designer',
         companyName: 'Designify',
         location: 'Cape Town, SA',
@@ -30,7 +30,7 @@ const Home = () => {
     },
     {
         id: '3',
-        companyLogo: 'https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg',
+   companyLogo: null,
         jobTitle: 'Backend Engineer',
         companyName: 'CloudBase',
         location: 'Johannesburg, SA',
@@ -41,7 +41,7 @@ const Home = () => {
     },
     {
         id: '4',
-        companyLogo: 'https://upload.wikimedia.org/wikipedia/commons/5/51/IBM_logo.svg',
+    companyLogo: null,
         jobTitle: 'Data Scientist',
         companyName: 'DataWave',
         location: 'Remote',
@@ -52,7 +52,7 @@ const Home = () => {
     },
     {
         id: '5',
-        companyLogo: 'https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg',
+        companyLogo: null,
         jobTitle: 'Mobile App Developer',
         companyName: 'Appify',
         location: 'Pretoria, SA',
@@ -73,7 +73,7 @@ const Home = () => {
     },
     {
         id: '7',
-        companyLogo: 'https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg',
+      companyLogo: null,
         jobTitle: 'Product Manager',
         companyName: 'InnovaTech',
         location: 'Remote',
@@ -93,10 +93,7 @@ const Home = () => {
                 
                 {/* Header */}
                 <View style={{ flexDirection: 'row', alignItems: 'center', width: '100%', marginBottom: 24 }}>
-                    {/* Profile Icon */}
-                    <TouchableOpacity>
-                        <Ionicons name="person-circle-outline" size={32} color="#007AFF" />
-                    </TouchableOpacity>
+                
                     {/* Search Bar */}
                     <View style={{ flex: 1, marginHorizontal: 12 }}>
                         <TextInput
@@ -120,7 +117,12 @@ const Home = () => {
                 {/* Job Posts */}
                 <View style={{ width: '100%', marginTop: 16 }}>
                     {jobs.map((job) => (
-                        <JobPost key={job.id} {...job} />
+                        <JobPost
+                            key={job.id}
+                            {...job}
+                            onHide={() => alert(`Hide job: ${job.jobTitle}`)}
+                            onSave={() => alert(`Saved job: ${job.jobTitle}`)}
+                        />
                     ))}
                 </View>
             </ScrollView>
