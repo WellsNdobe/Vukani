@@ -1,4 +1,4 @@
-const tintColorNude = "#d4a373"; // clay accent
+const tintColorNude = "#5d4832ff"; // clay accent
 
 export const Colors = {
   light: {
@@ -19,7 +19,7 @@ export const Colors = {
   },
   nude: {
     text: "#5c4033",         // soft brown text
-    background: "#f8ede3",   // light cream
+    background: "#eacbabff",   // light cream
     tint: tintColorNude,     // clay accent
     icon: "#a67c52",         // muted bronze
     tabIconDefault: "#c9ada7", // dusty pink/beige

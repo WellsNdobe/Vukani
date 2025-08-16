@@ -8,7 +8,7 @@ import { ScrollView, View } from "react-native";
 export default function Home() {
   return (
     <View style={{ flex: 1, backgroundColor: "#fff" }}>
-      <Header title="Jobs" />
+      <Header />
       <ScrollView contentContainerStyle={{ padding: 16 }}>
         {jobs.map(job => (
           <JobPost
