@@ -7,37 +7,33 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 export default function TabLayout() {
   return (
     <SafeAreaView style={styles.container}>
-    
-
       <Tabs
         screenOptions={{
           headerShown: false,
           tabBarShowLabel: true,
-          tabBarActiveTintColor: '#000', // iOS blue accent
-          tabBarInactiveTintColor: '#999',
+          tabBarActiveTintColor: '#2563eb', // Modern blue accent
+          tabBarInactiveTintColor: '#94a3b8', // Softer inactive color
           tabBarStyle: styles.tabBar,
-          tabBarLabelStyle: {
-            fontSize: 12,
-            fontWeight: '600',
-          },
+          tabBarLabelStyle: styles.tabLabel,
+          tabBarItemStyle: styles.tabItem,
         }}
       >
         <Tabs.Screen
           name="Index"
           options={{
             title: 'Home',
-            tabBarIcon: ({ color, size }) => (
-              <Ionicons name="home" size={size} color={color} />
+            tabBarIcon: ({ color }) => (
+              <Ionicons name="home" size={22} color={color} />
             ),
           }}
         />
     
-      <Tabs.Screen
+        <Tabs.Screen
           name="Jobs"
           options={{
-            title: 'Saved Jobs',
-            tabBarIcon: ({ color, size }) => (
-              <Ionicons name="briefcase" size={size} color={color} />
+            title: 'Saved',
+            tabBarIcon: ({ color }) => (
+              <Ionicons name="briefcase" size={20} color={color} />
             ),
           }}
         />
@@ -46,8 +42,8 @@ export default function TabLayout() {
           name="Messages"
           options={{
             title: 'Messages',
-            tabBarIcon: ({ color, size }) => (
-              <Ionicons name="chatbubble" size={size} color={color} />
+            tabBarIcon: ({ color }) => (
+              <Ionicons name="chatbubble-ellipses" size={22} color={color} />
             ),
           }}
         />
@@ -55,14 +51,12 @@ export default function TabLayout() {
         <Tabs.Screen
           name="Me"
           options={{
-            title: 'Me',
-            tabBarIcon: ({ color, size }) => (
-              <Ionicons name="person" size={size} color={color} />
+            title: 'Profile',
+            tabBarIcon: ({ color }) => (
+              <Ionicons name="person" size={22} color={color} />
             ),
           }}
         />
-
-
       </Tabs>
     </SafeAreaView>
   );
@@ -71,18 +65,29 @@ export default function TabLayout() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#040505ff', // Light background for modern look
   },
   tabBar: {
-    backgroundColor: '#fff', // Always white
-    height: 60,
-    paddingBottom: Platform.OS === 'ios' ? 12 : 8,
-    paddingTop: 6,
-    elevation: 5, // Android shadow
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowOffset: { width: 0, height: -2 },
-    shadowRadius: 6,
-    borderTopColor: '#eee', // Subtle top border
-    borderTopWidth: 1,
+    backgroundColor: '#ffffff',
+    height: Platform.OS === 'ios' ? 80 : 68,
+    paddingBottom: 0,
+    borderTopWidth: 0,
+    elevation: 1, // Softer Android shadow
+    shadowColor: 'rgba(0,0,0,0.08)',
+    shadowOpacity: 1,
+    shadowOffset: { width: 0, height: -4 },
+    shadowRadius: 8,
+  },
+  tabLabel: {
+    fontSize: 11,
+    fontWeight: '500',
+    letterSpacing: 0.2,
+    marginBottom: Platform.OS === 'ios' ? 16 : 6,
+  },
+  tabItem: {
+    paddingVertical: 6,
+    borderRadius: 12,
+    margin: 6,
+    marginBottom: Platform.OS === 'ios' ? 12 : 8,
   },
 });
