@@ -9,7 +9,7 @@ export default function LoginScreen() {
 
   const handleLogin = () => {
     login({ id: "1", name: "Demo User" }); // Replace with real auth
-    router.replace("/(tabs)/Index");
+    router.replace("/(tabs)/Index"); // Navigate to authenticated area
   };
 
   return (

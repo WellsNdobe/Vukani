@@ -8,55 +8,67 @@ export default function TabLayout() {
   return (
     <SafeAreaView style={styles.container}>
       <Tabs
-        screenOptions={{
-          headerShown: false,
-          tabBarShowLabel: true,
-          tabBarActiveTintColor: '#2563eb', // Modern blue accent
-          tabBarInactiveTintColor: '#94a3b8', // Softer inactive color
-          tabBarStyle: styles.tabBar,
-          tabBarLabelStyle: styles.tabLabel,
-          tabBarItemStyle: styles.tabItem,
-        }}
+      screenOptions={{
+        headerShown: false,
+        tabBarShowLabel: true,
+        tabBarActiveTintColor: '#2563eb', // Modern blue accent
+        tabBarInactiveTintColor: '#94a3b8', // Softer inactive color
+        tabBarStyle: styles.tabBar,
+        tabBarLabelStyle: styles.tabLabel,
+        tabBarItemStyle: styles.tabItem,
+      }}
       >
-        <Tabs.Screen
-          name="Index"
-          options={{
-            title: 'Home',
-            tabBarIcon: ({ color }) => (
-              <Ionicons name="home" size={22} color={color} />
-            ),
-          }}
-        />
+      <Tabs.Screen
+        name="Index"
+        options={{
+        title: 'Home',
+        tabBarIcon: ({ color }) => (
+          <Ionicons name="home" size={22} color={color} />
+        ),
+        }}
+      />
     
-        <Tabs.Screen
-          name="Jobs"
-          options={{
-            title: 'Saved',
-            tabBarIcon: ({ color }) => (
-              <Ionicons name="briefcase" size={20} color={color} />
-            ),
-          }}
-        />
+      <Tabs.Screen
+        name="Jobs"
+        options={{
+        title: 'Saved',
+        tabBarIcon: ({ color }) => (
+          <Ionicons name="briefcase" size={20} color={color} />
+        ),
+        }}
+      />
 
-        <Tabs.Screen
-          name="Messages"
-          options={{
-            title: 'Messages',
-            tabBarIcon: ({ color }) => (
-              <Ionicons name="chatbubble-ellipses" size={22} color={color} />
-            ),
-          }}
-        />
+      <Tabs.Screen
+        name="Create"
+        options={{
+        title: 'Create',
+        tabBarIcon: ({ color }) => (
+          <Ionicons name="add" size={22} color={color} />
+        ),
+        }}
+      />
 
-        <Tabs.Screen
-          name="Me"
-          options={{
-            title: 'Profile',
-            tabBarIcon: ({ color }) => (
-              <Ionicons name="person" size={22} color={color} />
-            ),
-          }}
-        />
+      <Tabs.Screen
+        name="Messages"
+        options={{
+        title: 'Messages',
+        tabBarIcon: ({ color }) => (
+          <Ionicons name="chatbubble-ellipses" size={22} color={color} />
+        ),
+        }}
+      />
+
+      <Tabs.Screen
+        name="Me"
+        options={{
+        title: 'Profile',
+        tabBarIcon: ({ color }) => (
+          <Ionicons name="person" size={22} color={color} />
+        ),
+        }}
+      />
+
+      
       </Tabs>
     </SafeAreaView>
   );
