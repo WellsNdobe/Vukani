@@ -1,57 +1,63 @@
+// components/JobPost.tsx
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import React, { useRef } from "react";
 import {
   Alert,
   Animated,
+  GestureResponderEvent,
   Image,
   StyleSheet,
   Text,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
 import { GestureHandlerRootView, Swipeable } from "react-native-gesture-handler";
 
-type JobPostProps = {
-  companyLogo: string | null; // Allow null for cases without a logo
+export type JobPostProps = {
+  id?: string; // optional, if given card press will navigate to /Jobs/:id
+  companyLogo?: string | null;
   jobTitle: string;
   companyName: string;
-  location: string;
-  timestamp: string;
-  description: string;
-  onApply: () => void;
-  onHide: () => void;
-  onSave: () => void;
+  location?: string;
+  timestamp?: string;
+  description?: string;
+  onApply?: () => void;
+  onHide?: () => void;
+  onSave?: () => void;
 };
 
-const JobPost = ({
-  companyLogo,
-  jobTitle,
-  companyName,
-  location,
-  timestamp,
-  description,
-  onApply,
-  onHide,
-  onSave
-}: JobPostProps) => {
-  const swipeableRef = useRef<Swipeable>(null);
-  
-  // Swipe right action (save)
-  const renderRightActions = (progress: Animated.AnimatedInterpolation<number>) => {
-    const trans = progress.interpolate({
+export default function JobPost(props: JobPostProps) {
+  const {
+    id,
+    companyLogo,
+    jobTitle,
+    companyName,
+    location,
+    timestamp,
+    description,
+    onApply,
+    onHide,
+    onSave,
+  } = props;
+
+  const swipeableRef = useRef<Swipeable | null>(null);
+  const router = useRouter();
+
+  // Right action (Save)
+  const renderRightActions = (progress: any) => {
+    const trans = progress.interpolate ? progress.interpolate({
       inputRange: [0, 1],
       outputRange: [80, 0],
-    });
-    
+    }) : 0;
+
     return (
-      <Animated.View 
-        style={[styles.rightAction, { transform: [{ translateX: trans }] }]}
-      >
-        <TouchableOpacity 
-          style={styles.actionButton} 
+      <Animated.View style={[styles.rightAction, { transform: [{ translateX: trans }] }]}>
+        <TouchableOpacity
+          style={styles.actionButton}
           onPress={() => {
             swipeableRef.current?.close();
-            onSave();
+            onSave?.();
             Alert.alert("Job Saved", "This job has been added to your saved items");
           }}
         >
@@ -62,22 +68,21 @@ const JobPost = ({
     );
   };
 
-  // Swipe left action (hide)
-  const renderLeftActions = (progress: Animated.AnimatedInterpolation<number>) => {
-    const trans = progress.interpolate({
+  // Left action (Hide)
+  const renderLeftActions = (progress: any) => {
+    const trans = progress.interpolate ? progress.interpolate({
       inputRange: [0, 1],
       outputRange: [-80, 0],
-    });
-    
+    }) : 0;
+
     return (
-      <Animated.View 
-        style={[styles.leftAction, { transform: [{ translateX: trans }] }]}
-      >
-        <TouchableOpacity 
-          style={styles.actionButton} 
+      <Animated.View style={[styles.leftAction, { transform: [{ translateX: trans }] }]}>
+        <TouchableOpacity
+          style={styles.actionButton}
           onPress={() => {
             swipeableRef.current?.close();
-            onHide();
+            onHide?.();
+            // optional confirmation
           }}
         >
           <Ionicons name="eye-off-outline" size={24} color="#fff" />
@@ -87,7 +92,24 @@ const JobPost = ({
     );
   };
 
+  // Card press: navigate to details if id exists, otherwise run onApply
+  const handleCardPress = () => {
+    if (id) {
+      router.push(`/Jobs/${id}`);
+      return;
+    }
+    onApply?.();
+  };
+
+  // Apply button press: stop propagation so card press doesn't fire
+  const handleApplyPress = (e: GestureResponderEvent) => {
+    // Prevent parent touch handlers (card press)
+    e.stopPropagation?.();
+    onApply?.();
+  };
+
   return (
+    // Note: ideally wrap your whole app in GestureHandlerRootView once (app/_layout.tsx)
     <GestureHandlerRootView style={styles.container}>
       <Swipeable
         ref={swipeableRef}
@@ -97,20 +119,20 @@ const JobPost = ({
         renderRightActions={renderRightActions}
         renderLeftActions={renderLeftActions}
       >
-        <TouchableOpacity 
-          style={styles.card} 
+        <TouchableOpacity
+          style={styles.card}
           activeOpacity={0.95}
-          onPress={onApply}
+          onPress={handleCardPress}
         >
           {/* Header */}
           <View style={styles.header}>
             {companyLogo ? (
-  <Image source={{ uri: companyLogo }} style={styles.logo} />
-) : (
-  <View style={styles.logo}>
-    <MaterialIcons name="business-center" size={24} color="#3B82F6" />
-  </View>
-)}
+              <Image source={{ uri: companyLogo }} style={styles.logo} />
+            ) : (
+              <View style={styles.logo}>
+                <MaterialIcons name="business-center" size={24} color="#3B82F6" />
+              </View>
+            )}
             <View style={styles.headerText}>
               <Text style={styles.jobTitle}>{jobTitle}</Text>
               <Text style={styles.company}>{companyName}</Text>
@@ -119,10 +141,12 @@ const JobPost = ({
           </View>
 
           {/* Location */}
-          <View style={styles.locationRow}>
-            <Ionicons name="location-outline" size={16} color="#6B7280" />
-            <Text style={styles.location}>{location}</Text>
-          </View>
+          {location ? (
+            <View style={styles.locationRow}>
+              <Ionicons name="location-outline" size={16} color="#6B7280" />
+              <Text style={styles.location}>{location}</Text>
+            </View>
+          ) : null}
 
           {/* Description */}
           <Text style={styles.description} numberOfLines={2}>
@@ -131,9 +155,10 @@ const JobPost = ({
 
           {/* Apply Button */}
           <View style={styles.applyContainer}>
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.applyButton}
-              onPress={onApply}
+              onPress={handleApplyPress}
+              activeOpacity={0.85}
             >
               <Text style={styles.applyText}>Apply Now</Text>
             </TouchableOpacity>
@@ -142,17 +167,17 @@ const JobPost = ({
       </Swipeable>
     </GestureHandlerRootView>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
     marginVertical: 8,
     marginHorizontal: 16,
     borderRadius: 16,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   card: {
-    backgroundColor: "#F3F4F6", // Changed from "#fff" to a slightly darker off-white
+    backgroundColor: "#F3F4F6",
     padding: 20,
     borderWidth: 1,
     borderColor: "#F1F5F9",
@@ -168,8 +193,8 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginRight: 12,
     backgroundColor: "#F8FAFC",
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   headerText: {
     flex: 1,
@@ -225,20 +250,20 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "flex-end",
     paddingRight: 20,
-    height: '100%',
+    height: "100%",
   },
   leftAction: {
     backgroundColor: "#EF4444",
     justifyContent: "center",
     alignItems: "flex-start",
     paddingLeft: 20,
-    height: '100%',
+    height: "100%",
   },
   actionButton: {
     alignItems: "center",
     justifyContent: "center",
     width: 80,
-    height: '100%',
+    height: "100%",
   },
   actionText: {
     color: "#fff",
@@ -247,5 +272,3 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
 });
-
-export default JobPost;
