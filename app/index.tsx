@@ -1,25 +1,24 @@
 // app/index.tsx
 import { useAuth } from "@/context/authContext";
-import { Slot, useRouter } from "expo-router";
-import { useEffect } from "react";
+import { Redirect } from "expo-router";
+import { ActivityIndicator, View } from "react-native";
 
 export default function Index() {
   const { user } = useAuth();
-  const router = useRouter();
 
-  useEffect(() => {
-    // If not logged in, send to auth flow
-    if (!user) {
-      // this runs after root layout mounts (because index is a route inside the Slot)
-      router.replace("/Auth/login");
-    }
-    // if user exists, do nothing — <Slot /> will render the (tabs) group (i.e. the app)
-  }, [user]);
-
-  if (!user) {
-    // avoid flashing anything while redirecting
-    return null;
+  // While auth is still loading, show spinner
+  if (user === undefined) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
   }
 
-  return <Slot />; // renders the (tabs) group (e.g. (tabs)/index.tsx becomes '/')
+  // Redirect based on auth state
+  if (!user) {
+    return <Redirect href="/Auth/login" />;
+  }
+
+  return <Redirect href="/(tabs)/Index" />;
 }
