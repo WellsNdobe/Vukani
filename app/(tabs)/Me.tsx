@@ -5,11 +5,11 @@ import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";
 import {
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from "react-native";
 
 export default function Profile() {
@@ -33,15 +33,14 @@ export default function Profile() {
   // Profile menu items
   const menuItems = [
     { icon: "settings-outline", name: "Settings" },
-    { icon: "briefcase-outline", name: "My Jobs" },
+    { icon: "briefcase-outline", name: "My Applications" },
     { icon: "bookmark-outline", name: "Saved Items" },
-    { icon: "notifications-outline", name: "Notifications" },
     { icon: "help-circle-outline", name: "Help Center" },
     { icon: "information-circle-outline", name: "About Vukani" },
   ];
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <View style={[styles.container, { backgroundColor: "#fff" }]}>
      
       
       <ScrollView contentContainerStyle={styles.scrollContent}>
@@ -52,7 +51,7 @@ export default function Profile() {
           </View>
           
           <View style={styles.userInfo}>
-            <Text style={[styles.userName, { color: colors.text }]}>{user?.name ?? "Guest"}</Text>
+            <Text style={[styles.userName, { color: colors.text }]}>{user?.name ?? "Lesedi Ncwana"}</Text>
             <Text style={[styles.userTitle, { color: complementaryColors.placeholder }]}>
               Product Designer at Vukani
             </Text>
@@ -70,10 +69,7 @@ export default function Profile() {
 
         {/* Stats Section */}
         <View style={[styles.statsContainer, { backgroundColor: complementaryColors.cardBackground }]}>
-          <View style={styles.statItem}>
-            <Text style={[styles.statValue, { color: colors.text }]}>24</Text>
-            <Text style={[styles.statLabel, { color: complementaryColors.placeholder }]}>Connections</Text>
-          </View>
+          
           
           <View style={[styles.statSeparator, { backgroundColor: complementaryColors.separator }]} />
           

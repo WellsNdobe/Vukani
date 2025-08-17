@@ -34,7 +34,7 @@ export default function TabLayout() {
         />
       
         <Tabs.Screen
-          name="Jobs"
+          name="Saved"
           options={{
             title: 'Saved',
             tabBarIcon: ({ color }) => (
@@ -49,7 +49,7 @@ export default function TabLayout() {
             title: 'Create',
             tabBarIcon: ({ color }) => (
               <View style={styles.createButton}>
-                <Ionicons name="add" size={24} color={colors.background} />
+                <Ionicons name="add" size={28} color={colors.background} />
               </View>
             ),
             tabBarLabel: () => null, // Hide label for create button

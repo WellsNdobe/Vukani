@@ -155,7 +155,7 @@ export default function JobPost(props: JobPostProps) {
     onSave?.();
   };
 
-  return (
+ return (
     <GestureHandlerRootView style={styles.container}>
       <Swipeable
         ref={swipeableRef}
@@ -184,10 +184,10 @@ export default function JobPost(props: JobPostProps) {
               <Text style={[styles.company, { color: colors.icon }]}>{companyName}</Text>
             </View>
             <TouchableOpacity onPress={handleSavePress} style={styles.saveIcon}>
-              <Ionicons
-                name={isSaved ? "bookmark" : "bookmark-outline"}
-                size={20}
-                color={isSaved ? colors.tint : colors.placeholder}
+              <Ionicons 
+                name={isSaved ? "bookmark" : "bookmark-outline"} 
+                size={20} 
+                color={isSaved ? colors.tint : colors.placeholder} 
               />
             </TouchableOpacity>
           </View>
@@ -200,14 +200,14 @@ export default function JobPost(props: JobPostProps) {
                 <Text style={[styles.detailText, { color: colors.icon }]}>{location}</Text>
               </View>
             )}
-
+            
             {salary && (
               <View style={styles.detailItem}>
                 <Ionicons name="cash-outline" size={14} color={colors.icon} />
                 <Text style={[styles.detailText, { color: colors.icon }]}>{salary}</Text>
               </View>
             )}
-
+            
             {jobType && (
               <View style={styles.detailItem}>
                 <Ionicons name="time-outline" size={14} color={colors.icon} />
@@ -228,7 +228,7 @@ export default function JobPost(props: JobPostProps) {
                 {timestamp}
               </Text>
             )}
-
+            
             <TouchableOpacity
               style={[styles.applyButton, { backgroundColor: colors.tint }]}
               onPress={handleApplyPress}
@@ -244,34 +244,115 @@ export default function JobPost(props: JobPostProps) {
 }
 
 const styles = StyleSheet.create({
-  container: { paddingHorizontal: 8, paddingVertical: 6 },
-  card: {
+  container: {
+    marginVertical: 5,
+    marginHorizontal: 10,
     borderRadius: 12,
+    overflow: "hidden",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
+    elevation: 2,
+  },
+  card: {
     padding: 12,
     borderWidth: 1,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
+    borderRadius: 20,
   },
-  header: { flexDirection: "row", alignItems: "center" },
-  logo: { width: 56, height: 56, borderRadius: 8, marginRight: 12, justifyContent: "center", alignItems: "center" },
-  headerText: { flex: 1 },
-  jobTitle: { fontSize: 16, fontWeight: "700" },
-  company: { marginTop: 4, fontSize: 12 },
-  saveIcon: { padding: 8 },
-  detailsRow: { flexDirection: "row", marginTop: 10, alignItems: "center" },
-  detailItem: { flexDirection: "row", alignItems: "center", marginRight: 12 },
-  detailText: { marginLeft: 6, fontSize: 12 },
-  description: { marginTop: 10, fontSize: 13 },
-  footer: { marginTop: 12, flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
-  timestamp: { fontSize: 12 },
-  applyButton: { paddingVertical: 8, paddingHorizontal: 14, borderRadius: 8 },
-  applyText: { color: "#fff", fontWeight: "600" },
-
-  // swipe actions
-  leftAction: { justifyContent: "center", flex: 1 },
-  rightAction: { justifyContent: "center", flex: 1, alignItems: "flex-end" },
-  actionButton: { width: 100, height: 56, justifyContent: "center", alignItems: "center" },
-  actionText: { color: "#fff", marginTop: 6 },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  logo: {
+    width: 48,
+    height: 48,
+    borderRadius: 12,
+    marginRight: 14,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  saveIcon: {
+    padding: 6,
+  },
+  headerText: {
+    flex: 1,
+  },
+  jobTitle: {
+    fontWeight: "600",
+    fontSize: 16,
+    marginBottom: 2,
+  },
+  company: {
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  detailsRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    marginBottom: 14,
+    gap: 12,
+  },
+  detailItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#f0e6d8",
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+    borderRadius: 12,
+    gap: 4,
+  },
+  detailText: {
+    fontSize: 12,
+    fontWeight: '500',
+  },
+  description: {
+    fontSize: 13,
+    lineHeight: 20,
+    marginBottom: 16,
+  },
+  footer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  timestamp: {
+    fontSize: 11,
+    fontWeight: '500',
+  },
+  applyButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 20,
+    borderRadius: 18,
+  },
+  applyText: {
+    color: "#fff",
+    fontSize: 13,
+    fontWeight: "600",
+  },
+  rightAction: {
+    justifyContent: "center",
+    alignItems: "flex-end",
+    paddingRight: 20,
+    height: "100%",
+  },
+  leftAction: {
+    justifyContent: "center",
+    alignItems: "flex-start",
+    paddingLeft: 20,
+    height: "100%",
+  },
+  actionButton: {
+    alignItems: "center",
+    justifyContent: "center",
+    width: 80,
+    height: "100%",
+  },
+  actionText: {
+    color: "#fff",
+    fontSize: 14,
+    fontWeight: "500",
+    marginTop: 6,
+  },
 });
