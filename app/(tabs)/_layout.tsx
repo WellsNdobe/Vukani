@@ -3,13 +3,12 @@ import { Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
 import React from 'react';
 import { Platform, StyleSheet, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function TabLayout() {
   const { colors } = useThemeColors('nude');
   
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+  <View style={styles.container}>
       <Tabs
         screenOptions={{
           headerShown: false,
@@ -77,7 +76,7 @@ export default function TabLayout() {
           }}
         />
       </Tabs>
-    </SafeAreaView>
+    </View>
   );
 }
 

@@ -8,6 +8,7 @@ export type Job = {
   timestamp?: string;
   description?: string;
   jobImage?: string;
+  salary?: string;
   onApply?: () => void;
 };
 
