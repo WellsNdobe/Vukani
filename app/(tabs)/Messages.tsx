@@ -1,33 +1,56 @@
-// components/MessageList.tsx
-import { Message, messages } from '@/data/messages'; // adjust path if needed
+import { Message, messages } from '@/data/messages';
+import { useThemeColors } from '@/hooks/useThemeColor';
 import React, { useState } from 'react';
 import {
-    FlatList,
-    Image,
-    Modal,
-    Pressable,
-    SafeAreaView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  FlatList,
+  Image,
+  Modal,
+  Pressable,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 
 export default function MessageList() {
+  const { colors } = useThemeColors("nude");
   const [selected, setSelected] = useState<Message | null>(null);
+  
+  // Complementary colors for the nude theme
+  const complementaryColors = {
+    border: "#e0d7c9",        // Light clay border
+    placeholder: "#8c6b5a",   // Muted brown
+    cardBackground: "#f8f4f0", // Very light cream
+    badge: "#8a9a5b",         // Moss green (for unread badges)
+  };
 
   const renderItem = ({ item }: { item: Message }) => (
-    <TouchableOpacity style={styles.row} onPress={() => setSelected(item)}>
-      <Image source={{ uri: item.companyLogo }} style={styles.logo} />
+    <TouchableOpacity 
+      style={[styles.row, { backgroundColor: '#fff' }]} 
+      onPress={() => setSelected(item)}
+    >
+      <View style={[styles.logo, { backgroundColor: complementaryColors.cardBackground }]}>
+        {item.companyLogo ? (
+          <Image source={{ uri: item.companyLogo }} style={styles.logoImage} />
+        ) : (
+          <View style={styles.logoPlaceholder}>
+            <Text style={[styles.logoText, { color: colors.tint }]}>
+              {item.companyName.charAt(0)}
+            </Text>
+          </View>
+        )}
+      </View>
+      
       <View style={styles.meta}>
         <View style={styles.metaTop}>
-          <Text style={styles.company}>{item.companyName}</Text>
-          <Text style={styles.time}>{item.timestamp}</Text>
+          <Text style={[styles.company, { color: colors.text }]}>{item.companyName}</Text>
+          <Text style={[styles.time, { color: complementaryColors.placeholder }]}>{item.timestamp}</Text>
         </View>
 
         <Text
-          style={styles.preview}
-          numberOfLines={2} // truncate long messages in the list
+          style={[styles.preview, { color: colors.icon }]}
+          numberOfLines={2}
           ellipsizeMode="tail"
         >
           {item.lastMessage}
@@ -35,7 +58,7 @@ export default function MessageList() {
       </View>
 
       {item.unreadCount ? (
-        <View style={styles.badge}>
+        <View style={[styles.badge, { backgroundColor: complementaryColors.badge }]}>
           <Text style={styles.badgeText}>{item.unreadCount}</Text>
         </View>
       ) : null}
@@ -43,16 +66,16 @@ export default function MessageList() {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: '#fff' }]}>
       <FlatList
         data={messages}
         keyExtractor={(i) => i.id}
         renderItem={renderItem}
-        ItemSeparatorComponent={() => <View style={styles.sep} />}
+        ItemSeparatorComponent={() => <View style={[styles.sep, { backgroundColor: complementaryColors.border }]} />}
         contentContainerStyle={{ padding: 12 }}
       />
 
-      {/* Simple modal to show full message details */}
+      {/* Message Detail Modal */}
       <Modal
         visible={!!selected}
         animationType="slide"
@@ -60,24 +83,45 @@ export default function MessageList() {
         onRequestClose={() => setSelected(null)}
       >
         <View style={styles.modalOverlay}>
-          <View style={styles.modalCard}>
+          <View style={[styles.modalCard, { backgroundColor: '#fff' }]}>
             {selected && (
               <>
                 <View style={styles.modalHeader}>
-                  <Image source={{ uri: selected.companyLogo }} style={styles.modalLogo} />
+                  <View style={[styles.modalLogo, { backgroundColor: complementaryColors.cardBackground }]}>
+                    {selected.companyLogo ? (
+                      <Image source={{ uri: selected.companyLogo }} style={styles.modalLogoImage} />
+                    ) : (
+                      <View style={styles.modalLogoPlaceholder}>
+                        <Text style={[styles.modalLogoText, { color: colors.tint }]}>
+                          {selected.companyName.charAt(0)}
+                        </Text>
+                      </View>
+                    )}
+                  </View>
+                  
                   <View style={{ marginLeft: 12, flex: 1 }}>
-                    <Text style={styles.company}>{selected.companyName}</Text>
-                    <Text style={styles.time}>{selected.timestamp}</Text>
+                    <Text style={[styles.company, { color: colors.text }]}>{selected.companyName}</Text>
+                    <Text style={[styles.time, { color: complementaryColors.placeholder }]}>{selected.timestamp}</Text>
                   </View>
                 </View>
 
-                <View style={{ marginTop: 12 }}>
-                  <Text style={styles.fullMessage}>{selected.lastMessage}</Text>
+                <View style={{ marginTop: 20 }}>
+                  <Text style={[styles.fullMessage, { color: colors.text }]}>{selected.lastMessage}</Text>
                 </View>
 
-                <View style={{ marginTop: 20, flexDirection: 'row', justifyContent: 'flex-end' }}>
-                  <Pressable onPress={() => setSelected(null)} style={styles.closeButton}>
-                    <Text style={styles.closeText}>Close</Text>
+                <View style={{ marginTop: 28, flexDirection: 'row', justifyContent: 'flex-end', gap: 12 }}>
+                  <Pressable 
+                    onPress={() => setSelected(null)} 
+                    style={[styles.closeButton, { borderColor: complementaryColors.border }]}
+                  >
+                    <Text style={[styles.closeText, { color: colors.text }]}>Close</Text>
+                  </Pressable>
+                  
+                  <Pressable 
+                    onPress={() => console.log("Reply pressed")} 
+                    style={[styles.replyButton, { backgroundColor: colors.tint }]}
+                  >
+                    <Text style={styles.replyText}>Reply</Text>
                   </Pressable>
                 </View>
               </>
@@ -90,34 +134,80 @@ export default function MessageList() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
-
+  container: { 
+    flex: 1, 
+  },
   row: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    paddingVertical: 12,
+    paddingVertical: 16,
+    paddingHorizontal: 12,
+    borderRadius: 16,
   },
-  logo: { width: 48, height: 48, borderRadius: 8, backgroundColor: '#eee' },
-  meta: { flex: 1, marginLeft: 12 },
-  metaTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  company: { fontSize: 16, fontWeight: '600', color: '#222' },
-  time: { fontSize: 12, color: '#888' },
-  preview: { marginTop: 6, fontSize: 14, color: '#444' },
+  logo: {
+    width: 56, 
+    height: 56, 
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    overflow: 'hidden',
+  },
+  logoImage: {
+    width: '100%',
+    height: '100%',
+  },
+  logoPlaceholder: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f0e6d8',
+  },
+  logoText: {
+    fontSize: 20,
+    fontWeight: '700',
+  },
+  meta: { 
+    flex: 1, 
+    marginLeft: 16 
+  },
+  metaTop: { 
+    flexDirection: 'row', 
+    justifyContent: 'space-between', 
+    alignItems: 'center',
+    marginBottom: 6,
+  },
+  company: { 
+    fontSize: 17, 
+    fontWeight: '600',
+    flexShrink: 1,
+  },
+  time: { 
+    fontSize: 13,
+    marginLeft: 8,
+  },
+  preview: { 
+    fontSize: 15,
+  },
   badge: {
     minWidth: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: '#ff3b30',
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 6,
-    marginLeft: 8,
+    alignSelf: 'center',
   },
-  badgeText: { color: '#fff', fontWeight: '700', fontSize: 12 },
-
-  sep: { height: 1, backgroundColor: '#f0f0f0', marginVertical: 4 },
-
-  /* Modal */
+  badgeText: { 
+    color: '#fff', 
+    fontWeight: '700', 
+    fontSize: 12 
+  },
+  sep: { 
+    height: 1, 
+    marginHorizontal: 12,
+  },
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.35)',
@@ -125,22 +215,62 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   modalCard: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
+    borderRadius: 20,
+    padding: 24,
     elevation: 8,
     shadowColor: '#000',
-    shadowOpacity: 0.12,
-    shadowRadius: 12,
+    shadowOpacity: 0.1,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 4 },
   },
-  modalHeader: { flexDirection: 'row', alignItems: 'center' },
-  modalLogo: { width: 56, height: 56, borderRadius: 10 },
-  fullMessage: { fontSize: 15, color: '#333', lineHeight: 20 },
+  modalHeader: { 
+    flexDirection: 'row', 
+    alignItems: 'center' 
+  },
+  modalLogo: { 
+    width: 64, 
+    height: 64, 
+    borderRadius: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+    overflow: 'hidden',
+  },
+  modalLogoImage: {
+    width: '100%',
+    height: '100%',
+  },
+  modalLogoPlaceholder: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f0e6d8',
+  },
+  modalLogoText: {
+    fontSize: 24,
+    fontWeight: '700',
+  },
+  fullMessage: { 
+    fontSize: 16, 
+    lineHeight: 24,
+  },
   closeButton: {
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 8,
-    backgroundColor: '#007AFF',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 16,
+    borderWidth: 1,
   },
-  closeText: { color: '#fff', fontWeight: '600' },
+  closeText: { 
+    fontWeight: '500',
+  },
+  replyButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 24,
+    borderRadius: 16,
+  },
+  replyText: {
+    color: '#fff',
+    fontWeight: '600',
+  },
 });
