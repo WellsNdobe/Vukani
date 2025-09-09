@@ -22,3 +22,4 @@ mongoose.connect(CONNECTION_URL)
 app.get('/', (req, res) => {
     res.send('Hello to Vukani API');
 });
+
