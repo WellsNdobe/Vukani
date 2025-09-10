@@ -1,4 +1,4 @@
-import e from 'express';
+
 import express from 'express';
 
 const router = express.Router();
@@ -6,6 +6,7 @@ const router = express.Router();
 import { createJob, getJobs } from '../controllers/jobs.js';
 
 router.get('/', getJobs);
-router.get('/', createJob);
+router.post('/createJob', createJob);
+
 
 export default router;
