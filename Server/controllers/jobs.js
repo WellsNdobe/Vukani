@@ -13,6 +13,24 @@ export const getJobs = async (req, res) => {
     
 }
 
+export const getJobById = async (req, res) => {
+  try {
+    const { id } = req.params; // from URL, e.g. /jobs/:id
+
+    const job = await Job.findOne({ id }); // searching by schema's "id", not _id
+
+    if (!job) {
+      return res.status(404).json({ message: "Job not found" });
+    }
+
+    res.status(200).json(job);
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+
+
 export const createJob = async(req, res) => {
 
     const job = req.body;
