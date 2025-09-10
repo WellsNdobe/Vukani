@@ -1,5 +1,6 @@
 // app/Jobs/[id].tsx
-import jobs from "@/data/jobs";
+import { ActivityIndicator } from "react-native";
+import { useEffect } from "react";
 import { useThemeColors } from "@/hooks/useThemeColor";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -15,21 +16,48 @@ import {
   View
 } from "react-native";
 
-export default function JobDetails() {
-  const { id } = useLocalSearchParams<{ id: string }>();
-  const router = useRouter();
-  const { colors } = useThemeColors("nude");
-  const [isSaved, setIsSaved] = useState(false);
-  
-  const job = jobs.find((j) => j.id === id);
-  
-  // Complementary colors for the nude theme
-  const complementaryColors = {
+const complementaryColors = {
     cardBackground: "#f8f4f0", // Very light cream
     border: "#e0d7c9",        // Light clay border
     placeholder: "#8c6b5a",   // Muted brown
     buttonPressed: "#b38a63", // Darker clay
   };
+
+export default function JobDetails() {
+const { id } = useLocalSearchParams<{ id: string }>();
+  const router = useRouter();
+  const { colors } = useThemeColors("nude");
+  const [isSaved, setIsSaved] = useState(false);
+  const [job, setJob] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!id) return;
+
+    const fetchJob = async () => {
+      try {
+        const res = await fetch(`http://localhost:5000/jobs/${id}`); // change URL if backend is hosted
+        if (!res.ok) throw new Error("Failed to fetch job");
+        const data = await res.json();
+        setJob(data);
+      } catch (error: any) {
+        console.error(error);
+        Alert.alert("Error", error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchJob();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <View style={[styles.center, { backgroundColor: "#fff" }]}>
+        <ActivityIndicator size="large" color={colors.tint} />
+      </View>
+    );
+  }
 
   if (!job) {
     return (
