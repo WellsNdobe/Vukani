@@ -15,8 +15,12 @@ app.use(cors());
 const CONNECTION_URL = process.env.MONGO_URI; // from .env
 const PORT = process.env.PORT || 5000;
 
+import jobsRoutes from './routes/jobs.js';
+
+app.use('/jobs', jobsRoutes);
+
 mongoose.connect(CONNECTION_URL)
-    .then(() => app.listen(PORT, () => console.log(`Server running on port: ${PORT}`)))
+    .then(() => app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`)))
     .catch((error) => console.log(error.message));
 
 app.get('/', (req, res) => {
