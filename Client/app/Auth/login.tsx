@@ -13,6 +13,8 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
+import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function LoginScreen() {
   const { login } = useAuth();
@@ -24,10 +26,28 @@ export default function LoginScreen() {
   const [isEmailFocused, setIsEmailFocused] = useState(false);
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
 
-  const handleLogin = () => {
-    login({ id: "1", name: "Demo User" });
+const handleLogin = async () => {
+  try {
+    const res = await axios.post("http://localhost:5000/auth/login", {
+      email,
+      password,
+    });
+
+    const { token, result } = res.data;
+
+    // Save token + user info locally
+    await AsyncStorage.setItem("token", token);
+    await AsyncStorage.setItem("user", JSON.stringify(result));
+
+    // ✅ If you have a global login() context:
+    // login(result);
+
+    // Navigate to main app
     router.replace("/(tabs)/Index");
-  };
+  } catch (error: any) {
+    alert(error.response?.data?.message || "Login failed");
+  }
+};
 
   const handleSocialLogin = (provider: string) => {
     console.log(`Logging in with ${provider}`);

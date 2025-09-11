@@ -12,6 +12,7 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
+import axios from "axios";
 
 export default function SignUpScreen() {
   const router = useRouter();
@@ -27,10 +28,26 @@ export default function SignUpScreen() {
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
   const [isConfirmFocused, setIsConfirmFocused] = useState(false);
 
-  const handleSignUp = () => {
-    // TODO: Add validation and backend integration
+const handleSignUp = async () => {
+  if (password !== confirmPassword) {
+    alert("Passwords do not match");
+    return;
+  }
+
+  try {
+    const res = await axios.post("http://localhost:5000/auth/register", {
+      name,
+      email,
+      password,
+      // no role sent → backend defaults to "user"
+    });
+
+    alert("Account created successfully!");
     router.replace("/Auth/login");
-  };
+  } catch (error: any) {
+    alert(error.response?.data?.message || "Registration failed");
+  }
+};
 
   const handleSocialSignUp = (provider: string) => {
     console.log(`Signing up with ${provider}`);

@@ -14,20 +14,24 @@ app.use(cors());
 
 const CONNECTION_URL = process.env.MONGO_URI; // from .env
 const PORT = process.env.PORT || 5000;
-
-import jobsRoutes from './routes/jobs.js';
-import applicationRoutes from "./routes/applicationRoutes.js";
-
-app.use("/applications", applicationRoutes);
-app.use('/jobs', jobsRoutes);
-
 mongoose.connect(CONNECTION_URL)
     .then(() => app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`)))
     .catch((error) => console.log(error.message));
 
+
+import jobsRoutes from './routes/jobs.js';
+import applicationRoutes from "./routes/application.js";
+import authRoutes from './routes/authRoutes.js';
+
+app.use('/auth', authRoutes);
 app.get('/', (req, res) => {
     res.send('Hello to Vukani API');
 });
+app.use("/applications", applicationRoutes);
+app.use('/jobs', jobsRoutes);
+
+
+
 
 
 
