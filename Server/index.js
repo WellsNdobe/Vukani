@@ -16,7 +16,9 @@ const CONNECTION_URL = process.env.MONGO_URI; // from .env
 const PORT = process.env.PORT || 5000;
 
 import jobsRoutes from './routes/jobs.js';
+import applicationRoutes from "./routes/applicationRoutes.js";
 
+app.use("/applications", applicationRoutes);
 app.use('/jobs', jobsRoutes);
 
 mongoose.connect(CONNECTION_URL)

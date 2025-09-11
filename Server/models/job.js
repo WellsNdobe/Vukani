@@ -5,7 +5,9 @@ const jobSchema = new mongoose.Schema({
   id : { type: String, required: true, unique: true },
   companyLogo: { type: String, default: null },
   jobTitle: { type: String, required: true },
-  companyName: { type: String, required: true },
+  postedBy: { type: mongoose.Schema.Types.ObjectId, ref: "Company", required: true },
+  jobType: { type: String, enum: ["Full-time", "Part-time", "Contract", "Internship"] },
+  jobCategory: { type: String, required: true },
   location: { type: String },
   timestamp: { type: String }, // could be Date if you want real timestamps
   description: { type: String },
