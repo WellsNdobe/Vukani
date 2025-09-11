@@ -1,4 +1,5 @@
 import Job from "../models/job.js";
+import Company from "../models/company.js";
 
 export const getJobs = async (req, res) => {
 
@@ -30,22 +31,39 @@ export const getJobById = async (req, res) => {
 };
 
 
+export const createJob = async (req, res) => {
+  const { jobTitle, jobType, jobCategory, location, description, salary, jobImage, companyLogo } = req.body;
 
-export const createJob = async(req, res) => {
+  try {
+    // Ensure request is authenticated
+    if (!req.user) return res.status(401).json({ message: "Unauthorized" });
 
-    const job = req.body;
-    const newJob = new Job(job);
+    const companyId = req.user.id;
 
-    try{
-       await newJob.save();
-        res.status(201).json(newJob);
-    }
+    // Ensure company exists
+    const company = await Company.findById(companyId);
+    if (!company) return res.status(404).json({ message: "Company not found" });
 
-    catch(error){
-        res.status(409).json({ message: error.message });
-    }
- 
-}
+    const newJob = new Job({
+      id: Date.now().toString(), // generate unique string ID
+      companyLogo: company.logo || companyLogo,
+      jobTitle,
+      postedBy: companyId, // ✅ required field filled from JWT
+      jobType,
+      jobCategory,
+      location,
+      timestamp: new Date().toISOString(),
+      description,
+      jobImage,
+      salary,
+    });
+
+    await newJob.save();
+    res.status(201).json(newJob);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 
 export const updateJob = (req, res) => {
     res.send('Update a job');
