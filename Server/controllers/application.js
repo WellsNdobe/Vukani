@@ -3,22 +3,23 @@ import Job from "../models/job.js";
 import User from "../models/user.js";
 
 export const createApplication = async (req, res) => {
-  const { jobId, applicantId, coverLetter, resume } = req.body;
+  const { jobId, coverLetter, resume } = req.body;
 
   try {
-    // Ensure job exists
+    // ensure job exists
     const job = await Job.findById(jobId);
     if (!job) return res.status(404).json({ message: "Job not found" });
 
-    // Ensure applicant exists
+    // applicant comes from JWT
+    const applicantId = req.user.id;
     const user = await User.findById(applicantId);
     if (!user) return res.status(404).json({ message: "User not found" });
 
     const newApplication = new Application({
       jobId,
       applicantId,
-      applicantName: user.name,
-      applicantEmail: user.email,
+      applicantName: user.name,     // pulled from User
+      applicantEmail: user.email,   // pulled from User
       coverLetter,
       resume,
     });
@@ -30,7 +31,7 @@ export const createApplication = async (req, res) => {
   }
 };
 
-// Get applications for a specific job
+// Get all applications for a job (company side)
 export const getApplicationsByJob = async (req, res) => {
   try {
     const applications = await Application.find({ jobId: req.params.jobId })
@@ -43,11 +44,11 @@ export const getApplicationsByJob = async (req, res) => {
   }
 };
 
-// Get applications by a specific user
+// Get all applications submitted by a user (applicant side)
 export const getApplicationsByUser = async (req, res) => {
   try {
     const applications = await Application.find({ applicantId: req.params.userId })
-      .populate("jobId", "jobTitle companyName location") // show job details
+      .populate("jobId", "jobTitle jobCategory location") // show job details
       .sort({ appliedAt: -1 });
 
     res.status(200).json(applications);

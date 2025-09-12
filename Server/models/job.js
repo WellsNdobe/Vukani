@@ -1,22 +1,16 @@
-// models/job.js
 import mongoose from "mongoose";
 
 const jobSchema = new mongoose.Schema({
-  id : { type: String, required: true, unique: true },
-  companyLogo: { type: String, default: null },
   jobTitle: { type: String, required: true },
   postedBy: { type: mongoose.Schema.Types.ObjectId, ref: "Company", required: true },
   jobType: { type: String, enum: ["Full-time", "Part-time", "Contract", "Internship"] },
   jobCategory: { type: String, required: true },
   location: { type: String },
-  timestamp: { type: String }, // could be Date if you want real timestamps
   description: { type: String },
   jobImage: { type: String },
   salary: { type: String },
-  // we won’t store onApply functions in DB, they belong in frontend
+  timestamp: { type: Date, default: Date.now }
 });
 
 const Job = mongoose.model("Job", jobSchema);
-
 export default Job;
-
