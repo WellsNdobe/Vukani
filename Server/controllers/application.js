@@ -6,7 +6,7 @@ export const createApplication = async (req, res) => {
   const { jobId, coverLetter, resume } = req.body;
 
   try {
-    // ensure job exists
+    // ✅ find job by MongoDB _id
     const job = await Job.findById(jobId);
     if (!job) return res.status(404).json({ message: "Job not found" });
 
@@ -16,12 +16,13 @@ export const createApplication = async (req, res) => {
     if (!user) return res.status(404).json({ message: "User not found" });
 
     const newApplication = new Application({
-      jobId,
+      jobId, // ✅ store Mongo _id reference
       applicantId,
-      applicantName: user.name,     // pulled from User
-      applicantEmail: user.email,   // pulled from User
+      applicantName: user.name,
+      applicantEmail: user.email,
       coverLetter,
       resume,
+      appliedAt: new Date().toISOString(),
     });
 
     await newApplication.save();
@@ -48,7 +49,7 @@ export const getApplicationsByJob = async (req, res) => {
 export const getApplicationsByUser = async (req, res) => {
   try {
     const applications = await Application.find({ applicantId: req.params.userId })
-      .populate("jobId", "jobTitle jobCategory location") // show job details
+      .populate("jobId", "jobTitle jobCategory location") // ✅ works since jobId is ObjectId
       .sort({ appliedAt: -1 });
 
     res.status(200).json(applications);
