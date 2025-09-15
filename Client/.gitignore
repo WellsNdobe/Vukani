@@ -2,7 +2,9 @@
 
 # dependencies
 node_modules/
-.firebaseConfig.js
+
+# Storage for firebase config file
+firebaseConfig.js
 
 # Expo
 .expo/
