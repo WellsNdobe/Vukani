@@ -1,4 +1,3 @@
-// components/JobPost.tsx
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useRef, useState } from "react";
@@ -15,7 +14,7 @@ import {
 import { GestureHandlerRootView, Swipeable } from "react-native-gesture-handler";
 
 export type JobPostProps = {
-  id?: string;
+  _id: string; // <-- match MongoDB schema
   companyLogo?: string | null;
   jobTitle: string;
   companyName: string;
@@ -31,7 +30,7 @@ export type JobPostProps = {
 
 export default function JobPost(props: JobPostProps) {
   const {
-    id,
+    _id,
     companyLogo,
     jobTitle,
     companyName,
@@ -131,19 +130,18 @@ export default function JobPost(props: JobPostProps) {
   };
 
   const handleCardPress = () => {
-    if (id) {
-      router.push(`/Jobs/${id}`);
+    if (_id) {
+      router.push(`/Jobs/${_id}`);
       return;
     }
     onApply?.();
   };
 
   // Updated: pressing the apply button now navigates to the job details page (/Jobs/[id])
-  // This allows you to show requirements on the details page before launching the application flow.
   const handleApplyPress = (e: GestureResponderEvent) => {
     e.stopPropagation?.();
-    if (id) {
-      router.push(`/Jobs/${id}`);
+    if (_id) {
+      router.push(`/Jobs/${_id}`);
       return;
     }
     onApply?.();
@@ -155,7 +153,7 @@ export default function JobPost(props: JobPostProps) {
     onSave?.();
   };
 
- return (
+  return (
     <GestureHandlerRootView style={styles.container}>
       <Swipeable
         ref={swipeableRef}
@@ -166,7 +164,10 @@ export default function JobPost(props: JobPostProps) {
         renderLeftActions={renderLeftActions}
       >
         <TouchableOpacity
-          style={[styles.card, { backgroundColor: colors.cardBackground, borderColor: colors.border }]}
+          style={[
+            styles.card,
+            { backgroundColor: colors.cardBackground, borderColor: colors.border },
+          ]}
           activeOpacity={0.95}
           onPress={handleCardPress}
         >
@@ -184,10 +185,10 @@ export default function JobPost(props: JobPostProps) {
               <Text style={[styles.company, { color: colors.icon }]}>{companyName}</Text>
             </View>
             <TouchableOpacity onPress={handleSavePress} style={styles.saveIcon}>
-              <Ionicons 
-                name={isSaved ? "bookmark" : "bookmark-outline"} 
-                size={20} 
-                color={isSaved ? colors.tint : colors.placeholder} 
+              <Ionicons
+                name={isSaved ? "bookmark" : "bookmark-outline"}
+                size={20}
+                color={isSaved ? colors.tint : colors.placeholder}
               />
             </TouchableOpacity>
           </View>
@@ -200,14 +201,14 @@ export default function JobPost(props: JobPostProps) {
                 <Text style={[styles.detailText, { color: colors.icon }]}>{location}</Text>
               </View>
             )}
-            
+
             {salary && (
               <View style={styles.detailItem}>
                 <Ionicons name="cash-outline" size={14} color={colors.icon} />
                 <Text style={[styles.detailText, { color: colors.icon }]}>{salary}</Text>
               </View>
             )}
-            
+
             {jobType && (
               <View style={styles.detailItem}>
                 <Ionicons name="time-outline" size={14} color={colors.icon} />
@@ -224,11 +225,9 @@ export default function JobPost(props: JobPostProps) {
           {/* Footer */}
           <View style={styles.footer}>
             {timestamp && (
-              <Text style={[styles.timestamp, { color: colors.placeholder }]}>
-                {timestamp}
-              </Text>
+              <Text style={[styles.timestamp, { color: colors.placeholder }]}>{timestamp}</Text>
             )}
-            
+
             <TouchableOpacity
               style={[styles.applyButton, { backgroundColor: colors.tint }]}
               onPress={handleApplyPress}
@@ -286,7 +285,7 @@ const styles = StyleSheet.create({
   },
   company: {
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   detailsRow: {
     flexDirection: "row",
@@ -305,7 +304,7 @@ const styles = StyleSheet.create({
   },
   detailText: {
     fontSize: 12,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   description: {
     fontSize: 13,
@@ -319,7 +318,7 @@ const styles = StyleSheet.create({
   },
   timestamp: {
     fontSize: 11,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   applyButton: {
     paddingVertical: 8,

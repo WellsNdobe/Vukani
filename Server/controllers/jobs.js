@@ -16,9 +16,8 @@ export const getJobs = async (req, res) => {
 
 export const getJobById = async (req, res) => {
   try {
-    const { id } = req.params; // from URL, e.g. /jobs/:id
-
-    const job = await Job.findOne({ id }); // searching by schema's "id", not _id
+   const job = await Job.findById(req.params.id);
+ // searching by schema's "id", not _id
 
     if (!job) {
       return res.status(404).json({ message: "Job not found" });
