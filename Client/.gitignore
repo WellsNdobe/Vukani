@@ -5,6 +5,7 @@ node_modules/
 
 # Storage for firebase config file
 firebaseConfig.js
+.env
 
 # Expo
 .expo/
