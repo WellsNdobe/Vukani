@@ -1,6 +1,6 @@
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import React, { useRef, useState } from "react";
+import React, { useRef, useMemo } from "react";
 import {
   Alert,
   Animated,
@@ -12,9 +12,10 @@ import {
   View,
 } from "react-native";
 import { GestureHandlerRootView, Swipeable } from "react-native-gesture-handler";
+import { useSavedJobs } from "../hooks/useSavedJobs"; // <-- adjust path if needed
 
 export type JobPostProps = {
-  _id: string; // <-- match MongoDB schema
+  _id: string;
   companyLogo?: string | null;
   jobTitle: string;
   companyName: string;
@@ -23,9 +24,9 @@ export type JobPostProps = {
   salary?: string;
   jobType?: string;
   description?: string;
+  userId: string; // required for the hook
   onApply?: () => void;
   onHide?: () => void;
-  onSave?: () => void;
 };
 
 export default function JobPost(props: JobPostProps) {
@@ -39,14 +40,20 @@ export default function JobPost(props: JobPostProps) {
     description,
     salary,
     jobType,
+    userId,
     onApply,
     onHide,
-    onSave,
   } = props;
 
   const swipeableRef = useRef<Swipeable | null>(null);
   const router = useRouter();
-  const [isSaved, setIsSaved] = useState(false);
+
+  const { savedJobs, toggleJob } = useSavedJobs(userId);
+
+  const isSaved = useMemo(
+    () => savedJobs.some((job) => job.jobId === _id),
+    [savedJobs, _id]
+  );
 
   // Nude theme colors
   const colors = {
@@ -82,15 +89,23 @@ export default function JobPost(props: JobPostProps) {
       >
         <TouchableOpacity
           style={styles.actionButton}
-          onPress={() => {
+          onPress={async () => {
             swipeableRef.current?.close();
-            setIsSaved(true);
-            onSave?.();
-            Alert.alert("Job Saved", "This job has been added to your saved items");
+            await toggleJob(_id, isSaved);
+            Alert.alert(
+              isSaved ? "Job Removed" : "Job Saved",
+              isSaved
+                ? "This job has been removed from your saved items"
+                : "This job has been added to your saved items"
+            );
           }}
         >
-          <Ionicons name="bookmark-outline" size={24} color="#fff" />
-          <Text style={styles.actionText}>Save</Text>
+          <Ionicons
+            name={isSaved ? "bookmark" : "bookmark-outline"}
+            size={24}
+            color="#fff"
+          />
+          <Text style={styles.actionText}>{isSaved ? "Unsave" : "Save"}</Text>
         </TouchableOpacity>
       </Animated.View>
     );
@@ -137,7 +152,6 @@ export default function JobPost(props: JobPostProps) {
     onApply?.();
   };
 
-  // Updated: pressing the apply button now navigates to the job details page (/Jobs/[id])
   const handleApplyPress = (e: GestureResponderEvent) => {
     e.stopPropagation?.();
     if (_id) {
@@ -147,10 +161,9 @@ export default function JobPost(props: JobPostProps) {
     onApply?.();
   };
 
-  const handleSavePress = (e: GestureResponderEvent) => {
+  const handleSavePress = async (e: GestureResponderEvent) => {
     e.stopPropagation?.();
-    setIsSaved(!isSaved);
-    onSave?.();
+    await toggleJob(_id, isSaved);
   };
 
   return (
@@ -177,12 +190,20 @@ export default function JobPost(props: JobPostProps) {
               <Image source={{ uri: companyLogo }} style={styles.logo} />
             ) : (
               <View style={[styles.logo, { backgroundColor: "#f0e6d8" }]}>
-                <MaterialIcons name="business-center" size={24} color={colors.tint} />
+                <MaterialIcons
+                  name="business-center"
+                  size={24}
+                  color={colors.tint}
+                />
               </View>
             )}
             <View style={styles.headerText}>
-              <Text style={[styles.jobTitle, { color: colors.text }]}>{jobTitle}</Text>
-              <Text style={[styles.company, { color: colors.icon }]}>{companyName}</Text>
+              <Text style={[styles.jobTitle, { color: colors.text }]}>
+                {jobTitle}
+              </Text>
+              <Text style={[styles.company, { color: colors.icon }]}>
+                {companyName}
+              </Text>
             </View>
             <TouchableOpacity onPress={handleSavePress} style={styles.saveIcon}>
               <Ionicons
@@ -198,21 +219,27 @@ export default function JobPost(props: JobPostProps) {
             {location && (
               <View style={styles.detailItem}>
                 <Ionicons name="location-outline" size={14} color={colors.icon} />
-                <Text style={[styles.detailText, { color: colors.icon }]}>{location}</Text>
+                <Text style={[styles.detailText, { color: colors.icon }]}>
+                  {location}
+                </Text>
               </View>
             )}
 
             {salary && (
               <View style={styles.detailItem}>
                 <Ionicons name="cash-outline" size={14} color={colors.icon} />
-                <Text style={[styles.detailText, { color: colors.icon }]}>{salary}</Text>
+                <Text style={[styles.detailText, { color: colors.icon }]}>
+                  {salary}
+                </Text>
               </View>
             )}
 
             {jobType && (
               <View style={styles.detailItem}>
                 <Ionicons name="time-outline" size={14} color={colors.icon} />
-                <Text style={[styles.detailText, { color: colors.icon }]}>{jobType}</Text>
+                <Text style={[styles.detailText, { color: colors.icon }]}>
+                  {jobType}
+                </Text>
               </View>
             )}
           </View>
@@ -225,7 +252,9 @@ export default function JobPost(props: JobPostProps) {
           {/* Footer */}
           <View style={styles.footer}>
             {timestamp && (
-              <Text style={[styles.timestamp, { color: colors.placeholder }]}>{timestamp}</Text>
+              <Text style={[styles.timestamp, { color: colors.placeholder }]}>
+                {timestamp}
+              </Text>
             )}
 
             <TouchableOpacity
