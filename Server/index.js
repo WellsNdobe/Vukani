@@ -22,6 +22,7 @@ mongoose.connect(CONNECTION_URL)
 import jobsRoutes from './routes/jobs.js';
 import applicationRoutes from "./routes/application.js";
 import authRoutes from './routes/authRoutes.js';
+import profile from './routes/profile.js';
 
 app.use('/auth', authRoutes);
 app.get('/', (req, res) => {
@@ -29,6 +30,7 @@ app.get('/', (req, res) => {
 });
 app.use("/applications", applicationRoutes);
 app.use('/jobs', jobsRoutes);
+app.use("/profile", profile);
 
 
 

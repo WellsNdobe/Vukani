@@ -25,7 +25,6 @@ export default function LoginScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [isEmailFocused, setIsEmailFocused] = useState(false);
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
-
 const handleLogin = async () => {
   try {
     const res = await axios.post("http://localhost:5000/auth/login", {
@@ -37,10 +36,9 @@ const handleLogin = async () => {
 
     // Save token + user info locally
     await AsyncStorage.setItem("token", token);
-    await AsyncStorage.setItem("user", JSON.stringify(result));
 
-    // ✅ If you have a global login() context:
-    // login(result);
+    // Option 2: store minimal user in context
+    login({ _id: result._id });  // ✅ pass only _id
 
     // Navigate to main app
     router.replace("/(tabs)/Index");
@@ -48,6 +46,7 @@ const handleLogin = async () => {
     alert(error.response?.data?.message || "Login failed");
   }
 };
+
 
   const handleSocialLogin = (provider: string) => {
     console.log(`Logging in with ${provider}`);

@@ -1,7 +1,8 @@
 // context/authContext.tsx
 import React, { createContext, ReactNode, useContext, useState } from "react";
 
-type User = { id: string; name: string } | null;
+// Store only the user _id (matches your backend)
+type User = { _id: string } | null;
 
 type AuthContextType = {
   user: User;
@@ -14,8 +15,13 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User>(null);
 
-  const login = (newUser: User) => setUser(newUser);
-  const logout = () => setUser(null);
+  const login = (newUser: User) => {
+    setUser(newUser);
+  };
+
+  const logout = () => {
+    setUser(null);
+  };
 
   return (
     <AuthContext.Provider value={{ user, login, logout }}>
@@ -29,5 +35,5 @@ export const useAuth = () => {
   if (!ctx) throw new Error("useAuth must be used inside AuthProvider");
   return ctx;
 };
+
 export default AuthContext;
-// This file provides the AuthContext and AuthProvider for managing authentication state in the app.

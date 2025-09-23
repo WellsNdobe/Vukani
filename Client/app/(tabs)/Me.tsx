@@ -1,62 +1,141 @@
-
 import { useAuth } from "@/context/authContext";
 import { useThemeColors } from "@/hooks/useThemeColor";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   ScrollView,
-  StyleSheet,
   Text,
   TouchableOpacity,
-  View
+  StyleSheet,
+  View,
+  ActivityIndicator,
 } from "react-native";
 
 export default function Profile() {
   const { user, logout } = useAuth();
   const router = useRouter();
   const { colors } = useThemeColors("nude");
+
+  const [profile, setProfile] = useState<any>(null);
+  const [savedJobs, setSavedJobs] = useState<number>(0);
+  const [applications, setApplications] = useState<number>(0);
+  const [loading, setLoading] = useState(true);
+
+  const API_BASE = "http://localhost:5000"; // 🔹 replace with your backend URL
+
+  useEffect(() => {
+    if (!user?._id) return;
+
+   const fetchData = async () => {
+  try {
   
+    const profileRes = await fetch(`${API_BASE}/profile/${user._id}`);
+
+    const profileData = await profileRes.json();
+  
+    setProfile(profileData);
+
+  
+    const savedRes = await fetch(
+      `${API_BASE}/profile/${user._id}/saved-jobs/count`
+    );
+ 
+    const savedData = await savedRes.json();
+
+    setSavedJobs(savedData.count);
+
+
+    const appsRes = await fetch(
+      `${API_BASE}/profile/${user._id}/applications/count`
+    );
+
+    const appsData = await appsRes.json();
+
+    setApplications(appsData.count);
+
+  } catch (err) {
+    console.error("Error fetching profile data:", err);
+  } finally {
+    setLoading(false);
+  }
+};
+
+    fetchData();
+  }, [user]);
+
   const handleLogout = () => {
     logout();
     router.replace("/Auth/login");
   };
 
-  // Complementary colors for the nude theme
   const complementaryColors = {
-    cardBackground: "#f0e6d8", // lighter cream
-    separator: "#e0d7c9", // light clay border
-    buttonPressed: "#b38a63", // darker clay
-    placeholder: "#8c6b5a", // muted brown
+    cardBackground: "#f0e6d8",
+    separator: "#e0d7c9",
+    buttonPressed: "#b38a63",
+    placeholder: "#8c6b5a",
   };
 
-  // Profile menu items
   const menuItems = [
-    { icon: "settings-outline", name: "Settings" },
-    { icon: "briefcase-outline", name: "My Applications" },
+  
     { icon: "bookmark-outline", name: "Saved Items" },
     { icon: "help-circle-outline", name: "Help Center" },
     { icon: "information-circle-outline", name: "About Vukani" },
   ];
 
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" color={colors.tint} />
+      </View>
+    );
+  }
+
+  // format "Joined" date
+  const joinedDate = profile?.createdAt
+    ? new Date(profile.createdAt).toLocaleDateString(undefined, {
+        year: "numeric",
+        month: "long",
+      })
+    : null;
+
   return (
     <View style={[styles.container, { backgroundColor: "#fff" }]}>
-     
-      
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Profile Header */}
         <View style={styles.profileHeader}>
-          <View style={[styles.avatarContainer, { backgroundColor: complementaryColors.cardBackground }]}>
-            <Ionicons name="person" size={60} color={complementaryColors.placeholder} />
+          <View
+            style={[
+              styles.avatarContainer,
+              { backgroundColor: complementaryColors.cardBackground },
+            ]}
+          >
+            <Ionicons
+              name="person"
+              size={60}
+              color={complementaryColors.placeholder}
+            />
           </View>
-          
+
           <View style={styles.userInfo}>
-            <Text style={[styles.userName, { color: colors.text }]}>{user?.name ?? "Lesedi Ncwana"}</Text>
-            <Text style={[styles.userTitle, { color: complementaryColors.placeholder }]}>
-              Product Designer at Vukani
+            <Text style={[styles.userName, { color: colors.text }]}>
+              {profile?.name ?? "Unknown User"}
             </Text>
-            
-            <TouchableOpacity 
+           
+            <Text
+              style={{ color: complementaryColors.placeholder, marginTop: 4 }}
+            >
+              {profile?.email ?? ""}
+            </Text>
+            {joinedDate && (
+              <Text
+                style={{ color: complementaryColors.placeholder, marginTop: 2 }}
+              >
+                Joined {joinedDate}
+              </Text>
+            )}
+
+            <TouchableOpacity
               style={[styles.editButton, { borderColor: colors.tint }]}
               onPress={() => console.log("Edit Profile")}
             >
@@ -68,42 +147,62 @@ export default function Profile() {
         </View>
 
         {/* Stats Section */}
-        <View style={[styles.statsContainer, { backgroundColor: complementaryColors.cardBackground }]}>
-          
-          
-          <View style={[styles.statSeparator, { backgroundColor: complementaryColors.separator }]} />
-          
+        <View
+          style={[
+            styles.statsContainer,
+            { backgroundColor: complementaryColors.cardBackground },
+          ]}
+        >
           <View style={styles.statItem}>
-            <Text style={[styles.statValue, { color: colors.text }]}>5</Text>
-            <Text style={[styles.statLabel, { color: complementaryColors.placeholder }]}>Saved Jobs</Text>
+            <Text style={[styles.statValue, { color: colors.text }]}>
+              {savedJobs}
+            </Text>
+            <Text
+              style={[styles.statLabel, { color: complementaryColors.placeholder }]}
+            >
+              Saved Jobs
+            </Text>
           </View>
-          
-          <View style={[styles.statSeparator, { backgroundColor: complementaryColors.separator }]} />
-          
+
+          <View
+            style={[
+              styles.statSeparator,
+              { backgroundColor: complementaryColors.separator },
+            ]}
+          />
+
           <View style={styles.statItem}>
-            <Text style={[styles.statValue, { color: colors.text }]}>12</Text>
-            <Text style={[styles.statLabel, { color: complementaryColors.placeholder }]}>Applications</Text>
+            <Text style={[styles.statValue, { color: colors.text }]}>
+              {applications}
+            </Text>
+            <Text
+              style={[styles.statLabel, { color: complementaryColors.placeholder }]}
+            >
+              Applications
+            </Text>
           </View>
         </View>
 
         {/* Profile Menu */}
         <View style={styles.menuContainer}>
           {menuItems.map((item, index) => (
-            <TouchableOpacity 
-              key={index} 
+            <TouchableOpacity
+              key={index}
               style={styles.menuItem}
               onPress={() => console.log(`Navigating to ${item.name}`)}
             >
-              <Ionicons 
-                name={item.icon as any} 
-                size={24} 
-                color={complementaryColors.placeholder} 
+              <Ionicons
+                name={item.icon as any}
+                size={24}
+                color={complementaryColors.placeholder}
               />
-              <Text style={[styles.menuText, { color: colors.text }]}>{item.name}</Text>
-              <MaterialCommunityIcons 
-                name="chevron-right" 
-                size={24} 
-                color={complementaryColors.placeholder} 
+              <Text style={[styles.menuText, { color: colors.text }]}>
+                {item.name}
+              </Text>
+              <MaterialCommunityIcons
+                name="chevron-right"
+                size={24}
+                color={complementaryColors.placeholder}
                 style={styles.chevron}
               />
             </TouchableOpacity>
@@ -111,17 +210,22 @@ export default function Profile() {
         </View>
 
         {/* Logout Button */}
-        <TouchableOpacity 
-          style={[styles.logoutButton, { backgroundColor: complementaryColors.cardBackground }]}
+        <TouchableOpacity
+          style={[
+            styles.logoutButton,
+            { backgroundColor: complementaryColors.cardBackground },
+          ]}
           onPress={handleLogout}
           activeOpacity={0.8}
         >
-          <Ionicons 
-            name="log-out-outline" 
-            size={24} 
-            color={complementaryColors.placeholder} 
+          <Ionicons
+            name="log-out-outline"
+            size={24}
+            color={complementaryColors.placeholder}
           />
-          <Text style={[styles.logoutText, { color: complementaryColors.placeholder }]}>
+          <Text
+            style={[styles.logoutText, { color: complementaryColors.placeholder }]}
+          >
             Log Out
           </Text>
         </TouchableOpacity>
