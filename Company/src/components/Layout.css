@@ -1,0 +1,39 @@
+/* Layout.css */
+
+.layout {
+  display: flex;
+  min-height: 100vh;
+  font-family: 'Inter', sans-serif;
+  background-color: #f5f6fa;
+}
+
+/* Sidebar already styled in Sidebar.css */
+
+.layout main {
+  flex: 1;
+  padding: 2.5rem 3rem;
+  background-color: #f5f6fa;
+  overflow-y: auto;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.03);
+  transition: all 0.3s ease;
+}
+
+/* Optional: add a subtle card-like effect for sections inside main */
+.layout main section {
+  background: #ffffff;
+  border-radius: 0.75rem;
+  padding: 1.5rem 2rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* Optional: make layout responsive for smaller screens */
+@media (max-width: 768px) {
+  .layout {
+    flex-direction: column;
+  }
+
+  .layout main {
+    padding: 2rem;
+  }
+}
