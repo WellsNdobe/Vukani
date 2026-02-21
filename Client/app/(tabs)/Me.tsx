@@ -16,7 +16,7 @@ import {
 export default function Profile() {
   const { user, logout } = useAuth();
   const router = useRouter();
-  const { colors } = useThemeColors("nude");
+  const { colors } = useThemeColors("sage");
 
   const [profile, setProfile] = useState<any>(null);
   const [savedJobs, setSavedJobs] = useState<number>(0);
@@ -55,13 +55,6 @@ export default function Profile() {
     router.replace("/Auth/login");
   };
 
-  const complementaryColors = {
-    cardBackground: "#f0e6d8",
-    separator: "#e0d7c9",
-    buttonPressed: "#b38a63",
-    placeholder: "#8c6b5a",
-  };
-
   const menuItems = [
   
     { icon: "bookmark-outline", name: "Saved Items" },
@@ -86,20 +79,20 @@ export default function Profile() {
     : null;
 
   return (
-    <View style={[styles.container, { backgroundColor: "#fff" }]}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}> 
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Profile Header */}
         <View style={styles.profileHeader}>
           <View
             style={[
               styles.avatarContainer,
-              { backgroundColor: complementaryColors.cardBackground },
+              { backgroundColor: colors.divider },
             ]}
           >
             <Ionicons
               name="person"
               size={60}
-              color={complementaryColors.placeholder}
+              color={colors.placeholder}
             />
           </View>
 
@@ -109,13 +102,13 @@ export default function Profile() {
             </Text>
            
             <Text
-              style={{ color: complementaryColors.placeholder, marginTop: 4 }}
+              style={{ color: colors.placeholder, marginTop: 4 }}
             >
               {profile?.email ?? ""}
             </Text>
             {joinedDate && (
               <Text
-                style={{ color: complementaryColors.placeholder, marginTop: 2 }}
+                style={{ color: colors.placeholder, marginTop: 2 }}
               >
                 Joined {joinedDate}
               </Text>
@@ -136,7 +129,7 @@ export default function Profile() {
         <View
           style={[
             styles.statsContainer,
-            { backgroundColor: complementaryColors.cardBackground },
+            { backgroundColor: colors.divider },
           ]}
         >
           <View style={styles.statItem}>
@@ -144,7 +137,7 @@ export default function Profile() {
               {savedJobs}
             </Text>
             <Text
-              style={[styles.statLabel, { color: complementaryColors.placeholder }]}
+              style={[styles.statLabel, { color: colors.placeholder }]}
             >
               Saved Jobs
             </Text>
@@ -153,7 +146,7 @@ export default function Profile() {
           <View
             style={[
               styles.statSeparator,
-              { backgroundColor: complementaryColors.separator },
+              { backgroundColor: colors.separator },
             ]}
           />
 
@@ -162,7 +155,7 @@ export default function Profile() {
               {applications}
             </Text>
             <Text
-              style={[styles.statLabel, { color: complementaryColors.placeholder }]}
+              style={[styles.statLabel, { color: colors.placeholder }]}
             >
               Applications
             </Text>
@@ -180,7 +173,7 @@ export default function Profile() {
               <Ionicons
                 name={item.icon as any}
                 size={24}
-                color={complementaryColors.placeholder}
+                color={colors.placeholder}
               />
               <Text style={[styles.menuText, { color: colors.text }]}>
                 {item.name}
@@ -188,7 +181,7 @@ export default function Profile() {
               <MaterialCommunityIcons
                 name="chevron-right"
                 size={24}
-                color={complementaryColors.placeholder}
+                color={colors.placeholder}
                 style={styles.chevron}
               />
             </TouchableOpacity>
@@ -199,7 +192,7 @@ export default function Profile() {
         <TouchableOpacity
           style={[
             styles.logoutButton,
-            { backgroundColor: complementaryColors.cardBackground },
+            { backgroundColor: colors.divider },
           ]}
           onPress={handleLogout}
           activeOpacity={0.8}
@@ -207,10 +200,10 @@ export default function Profile() {
           <Ionicons
             name="log-out-outline"
             size={24}
-            color={complementaryColors.placeholder}
+            color={colors.placeholder}
           />
           <Text
-            style={[styles.logoutText, { color: complementaryColors.placeholder }]}
+            style={[styles.logoutText, { color: colors.placeholder }]}
           >
             Log Out
           </Text>
