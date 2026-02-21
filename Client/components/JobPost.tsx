@@ -1,6 +1,6 @@
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import React, { useRef, useMemo } from "react";
+import React, { useEffect, useRef, useMemo } from "react";
 import { useThemeColors } from "@/hooks/useThemeColor";
 import {
   Alert,
@@ -10,10 +10,12 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
+  useWindowDimensions,
   View,
 } from "react-native";
 import { GestureHandlerRootView, Swipeable } from "react-native-gesture-handler";
-import { useSavedJobs } from "../hooks/useSavedJobs"; // <-- adjust path if needed
+import { useSavedJobs } from "../hooks/useSavedJobs";
+import { useAuth } from "@/context/authContext";
 
 export type JobPostProps = {
   _id: string;
@@ -25,7 +27,7 @@ export type JobPostProps = {
   salary?: string;
   jobType?: string;
   description?: string;
-  userId: string; // required for the hook
+  userId?: string;
   onApply?: () => void;
   onHide?: () => void;
 };
@@ -48,11 +50,19 @@ export default function JobPost(props: JobPostProps) {
 
   const swipeableRef = useRef<Swipeable | null>(null);
   const router = useRouter();
+  const { user } = useAuth();
+  const { width } = useWindowDimensions();
+  const isCompact = width <= 360;
 
-  const { savedJobs, toggleJob } = useSavedJobs(userId);
+  const effectiveUserId = userId ?? user?._id;
+  const { savedJobs, toggleJob, fetchSavedJobs } = useSavedJobs(effectiveUserId);
+
+  useEffect(() => {
+    fetchSavedJobs();
+  }, [fetchSavedJobs]);
 
   const isSaved = useMemo(
-    () => savedJobs.some((job) => job.jobId === _id),
+    () => savedJobs.some((job) => (typeof job.jobId === "string" ? job.jobId : job.jobId?._id) === _id),
     [savedJobs, _id]
   );
 
@@ -85,6 +95,10 @@ export default function JobPost(props: JobPostProps) {
           style={styles.actionButton}
           onPress={async () => {
             swipeableRef.current?.close();
+            if (!effectiveUserId) {
+              Alert.alert("Login required", "Please log in to save jobs.");
+              return;
+            }
             await toggleJob(_id, isSaved);
             Alert.alert(
               isSaved ? "Job Removed" : "Job Saved",
@@ -157,11 +171,15 @@ export default function JobPost(props: JobPostProps) {
 
   const handleSavePress = async (e: GestureResponderEvent) => {
     e.stopPropagation?.();
+    if (!effectiveUserId) {
+      Alert.alert("Login required", "Please log in to save jobs.");
+      return;
+    }
     await toggleJob(_id, isSaved);
   };
 
   return (
-    <GestureHandlerRootView style={styles.container}>
+    <GestureHandlerRootView style={[styles.container, isCompact && styles.containerCompact]}>
       <Swipeable
         ref={swipeableRef}
         friction={2}
@@ -173,17 +191,18 @@ export default function JobPost(props: JobPostProps) {
         <TouchableOpacity
           style={[
             styles.card,
+            isCompact && styles.cardCompact,
             { backgroundColor: colors.cardBackground, borderColor: colors.border },
           ]}
           activeOpacity={0.95}
           onPress={handleCardPress}
         >
           {/* Header */}
-          <View style={styles.header}>
+          <View style={[styles.header, isCompact && styles.headerCompact]}>
             {companyLogo ? (
-              <Image source={{ uri: companyLogo }} style={styles.logo} />
+              <Image source={{ uri: companyLogo }} style={[styles.logo, isCompact && styles.logoCompact]} />
             ) : (
-              <View style={[styles.logo, { backgroundColor: colors.divider }]}>
+              <View style={[styles.logo, isCompact && styles.logoCompact, { backgroundColor: colors.divider }]}>
                 <MaterialIcons
                   name="business-center"
                   size={24}
@@ -209,7 +228,7 @@ export default function JobPost(props: JobPostProps) {
           </View>
 
           {/* Job Details Row */}
-          <View style={styles.detailsRow}>
+          <View style={[styles.detailsRow, isCompact && styles.detailsRowCompact]}>
             {location && (
               <View style={[styles.detailItem, { backgroundColor: colors.divider }]}>
                 <Ionicons name="location-outline" size={14} color={colors.icon} />
@@ -219,7 +238,7 @@ export default function JobPost(props: JobPostProps) {
               </View>
             )}
 
-            {salary && (
+            {!isCompact && salary && (
               <View style={[styles.detailItem, { backgroundColor: colors.divider }]}>
                 <Ionicons name="cash-outline" size={14} color={colors.icon} />
                 <Text style={[styles.detailText, { color: colors.icon }]}>
@@ -228,7 +247,7 @@ export default function JobPost(props: JobPostProps) {
               </View>
             )}
 
-            {jobType && (
+            {!isCompact && jobType && (
               <View style={[styles.detailItem, { backgroundColor: colors.divider }]}>
                 <Ionicons name="time-outline" size={14} color={colors.icon} />
                 <Text style={[styles.detailText, { color: colors.icon }]}>
@@ -239,24 +258,27 @@ export default function JobPost(props: JobPostProps) {
           </View>
 
           {/* Description */}
-          <Text style={[styles.description, { color: colors.text }]} numberOfLines={2}>
-            {description}
-          </Text>
+          {!isCompact ? (
+            <Text style={[styles.description, { color: colors.text }]} numberOfLines={2}>
+              {description}
+            </Text>
+          ) : null}
 
           {/* Footer */}
-          <View style={styles.footer}>
-            {timestamp && (
+          <View style={[styles.footer, isCompact && styles.footerCompact]}>
+            {!isCompact && timestamp && (
               <Text style={[styles.timestamp, { color: colors.placeholder }]}>
                 {timestamp}
               </Text>
             )}
 
             <TouchableOpacity
-              style={[styles.applyButton, { backgroundColor: colors.tint }]}
+              style={[styles.detailsButton, { backgroundColor: colors.tint }]}
               onPress={handleApplyPress}
               activeOpacity={0.85}
+              accessibilityLabel="View job details"
             >
-              <Text style={styles.applyText}>View details</Text>
+              <Ionicons name="eye-outline" size={18} color="#fff" />
             </TouchableOpacity>
           </View>
         </TouchableOpacity>
@@ -277,15 +299,27 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
     elevation: 2,
   },
+  containerCompact: {
+    marginVertical: 4,
+    marginHorizontal: 8,
+  },
   card: {
     padding: 12,
     borderWidth: 1,
     borderRadius: 20,
   },
+  cardCompact: {
+    paddingVertical: 10,
+    paddingHorizontal: 10,
+    borderRadius: 16,
+  },
   header: {
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 12,
+  },
+  headerCompact: {
+    marginBottom: 8,
   },
   logo: {
     width: 48,
@@ -294,6 +328,12 @@ const styles = StyleSheet.create({
     marginRight: 14,
     justifyContent: "center",
     alignItems: "center",
+  },
+  logoCompact: {
+    width: 40,
+    height: 40,
+    borderRadius: 10,
+    marginRight: 10,
   },
   saveIcon: {
     padding: 6,
@@ -315,6 +355,10 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     marginBottom: 14,
     gap: 12,
+  },
+  detailsRowCompact: {
+    marginBottom: 8,
+    gap: 8,
   },
   detailItem: {
     flexDirection: "row",
@@ -338,19 +382,17 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
   },
+  footerCompact: {
+    justifyContent: "flex-end",
+  },
   timestamp: {
     fontSize: 11,
     fontWeight: "500",
   },
-  applyButton: {
+  detailsButton: {
     paddingVertical: 8,
-    paddingHorizontal: 20,
-    borderRadius: 18,
-  },
-  applyText: {
-    color: "#fff",
-    fontSize: 13,
-    fontWeight: "600",
+    paddingHorizontal: 12,
+    borderRadius: 16,
   },
   rightAction: {
     justifyContent: "center",

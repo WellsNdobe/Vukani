@@ -1,5 +1,5 @@
 // app/Jobs/[id].tsx
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -14,14 +14,26 @@ import { apiClient } from "@/constants/apiClient";
 import { useThemeColors } from "../../hooks/useThemeColor";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import { useAuth } from "@/context/authContext";
+import { useSavedJobs } from "@/hooks/useSavedJobs";
 
 export default function JobDetails() {
-  const { id: jobId } = useLocalSearchParams<{ id: string }>();
+  const { id } = useLocalSearchParams<{ id: string | string[] }>();
+  const jobId = Array.isArray(id) ? id[0] : id;
   const router = useRouter();
   const { colors } = useThemeColors("sage");
-  const [isSaved, setIsSaved] = useState(false);
   const [job, setJob] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
+  const { savedJobs, toggleJob, fetchSavedJobs } = useSavedJobs(user?._id);
+
+  const isSaved = useMemo(() => {
+    if (!jobId) return false;
+    return savedJobs.some(
+      (savedJob) =>
+        (typeof savedJob.jobId === "string" ? savedJob.jobId : savedJob.jobId?._id) === jobId
+    );
+  }, [savedJobs, jobId]);
 
   useEffect(() => {
     if (!jobId) return;
@@ -40,6 +52,11 @@ export default function JobDetails() {
 
     fetchJob();
   }, [jobId]);
+
+  useEffect(() => {
+    if (!user?._id) return;
+    fetchSavedJobs();
+  }, [user?._id, fetchSavedJobs]);
 
   if (loading) {
     return (
@@ -63,12 +80,13 @@ export default function JobDetails() {
     );
   }
 
-  const handleSaveJob = () => {
-    setIsSaved(!isSaved);
-    Alert.alert(
-      isSaved ? "Job Unsaved" : "Job Saved",
-      isSaved ? "Removed from saved jobs" : "Added to your saved jobs"
-    );
+  const handleSaveJob = async () => {
+    if (!user?._id || !jobId) {
+      Alert.alert("Login required", "Log in to save jobs.");
+      return;
+    }
+
+    await toggleJob(jobId, isSaved);
   };
 
   const formatDate = (dateString: string) => {

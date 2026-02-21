@@ -27,9 +27,6 @@
 7. **Search UI is present but not wired into the job feed.**
    Home screen renders a `Header` search input but does not pass handlers/value to filter jobs. This is a dead interaction and can frustrate users.
 
-8. **"Save" behavior is inconsistent across screens.**
-   Job card save uses `useSavedJobs`, while job details save is a local toggle plus alert only. Users can see conflicting saved states depending on where they interact.
-
 9. **Primary CTA language and behavior mismatch.**
    Home card uses "View details" in the apply button location; job detail has both save/apply patterns and alert-driven fallbacks. CTA intent hierarchy is unclear for users trying to quickly apply.
 
@@ -69,3 +66,4 @@
 ## Done
 
 1. Implemented a **single API client/config** by introducing an environment-driven API base URL and shared Axios client with auth-header interceptor, and updated major job/auth/profile/saved calls to use it.
+2. Unified **job save behavior** by wiring job details into `useSavedJobs`, so saved state is consistent with the list cards.

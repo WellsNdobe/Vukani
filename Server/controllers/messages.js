@@ -1,4 +1,5 @@
 //Controllers for handling messages in the application
+import mongoose from 'mongoose';
 import Message from '../models/messages.js';
 import User from '../models/user.js';
 
@@ -14,7 +15,7 @@ export const sendMessage = async (req, res) => {
             return res.status(404).json({ message: 'Sender or receiver not found' });
         }
         // Create and save the message
-        const newMessage = new Message({ sender: senderId, receiver: receiverId, content });
+        const newMessage = new Message({ sender: senderId, receiver: receiverId, content, read: false });
         await newMessage.save();
         res.status(201).json(newMessage);
     } catch (error) {
@@ -39,6 +40,87 @@ export const getMessagesBetweenUsers = async (req, res) => {
             ]
         }).sort({ timestamp: 1 });
         res.status(200).json(messages);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// Get message threads for the authenticated user
+export const getMessageThreads = async (req, res) => {
+    try {
+        const userId = new mongoose.Types.ObjectId(req.user.id);
+
+        const threads = await Message.aggregate([
+            {
+                $match: {
+                    $or: [{ sender: userId }, { receiver: userId }]
+                }
+            },
+            {
+                $addFields: {
+                    counterpart: {
+                        $cond: [{ $eq: ['$sender', userId] }, '$receiver', '$sender']
+                    }
+                }
+            },
+            { $sort: { timestamp: -1 } },
+            {
+                $group: {
+                    _id: '$counterpart',
+                    lastMessage: { $first: '$content' },
+                    lastTimestamp: { $first: '$timestamp' },
+                    lastMessageId: { $first: '$_id' },
+                    unreadCount: {
+                        $sum: {
+                            $cond: [
+                                { $and: [{ $eq: ['$receiver', userId] }, { $eq: ['$read', false] }] },
+                                1,
+                                0
+                            ]
+                        }
+                    }
+                }
+            },
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: '_id',
+                    foreignField: '_id',
+                    as: 'counterpart'
+                }
+            },
+            { $unwind: '$counterpart' },
+            {
+                $project: {
+                    threadId: '$_id',
+                    counterpartId: '$_id',
+                    counterpartName: '$counterpart.name',
+                    counterpartEmail: '$counterpart.email',
+                    counterpartRole: '$counterpart.role',
+                    counterpartAvatarUrl: '$counterpart.avatarUrl',
+                    lastMessage: 1,
+                    lastTimestamp: 1,
+                    unreadCount: 1
+                }
+            },
+            { $sort: { lastTimestamp: -1 } }
+        ]);
+
+        res.status(200).json(threads);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// Mark messages as read between authenticated user and a counterpart
+export const markThreadRead = async (req, res) => {
+    const { counterpartId } = req.params;
+    try {
+        await Message.updateMany(
+            { sender: counterpartId, receiver: req.user.id, read: false },
+            { $set: { read: true } }
+        );
+        res.status(200).json({ message: 'Thread marked as read' });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

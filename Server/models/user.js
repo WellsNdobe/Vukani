@@ -9,6 +9,7 @@ const userSchema = new mongoose.Schema({
     enum: ["applicant", "company", "admin"], 
     default: "applicant" 
   },
+  avatarUrl: { type: String },
   createdAt: { type: Date, default: Date.now }
 });
 

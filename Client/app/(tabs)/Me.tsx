@@ -29,19 +29,29 @@ export default function Profile() {
 
    const fetchData = async () => {
   try {
-  
-    const [{ data: profileData }, { data: savedData }, { data: appsData }] = await Promise.all([
+    const [profileResult, savedResult, appsResult] = await Promise.allSettled([
       apiClient.get(`/profile/${user._id}`),
       apiClient.get(`/profile/${user._id}/saved-jobs/count`),
       apiClient.get(`/profile/${user._id}/applications/count`),
     ]);
 
-    setProfile(profileData);
-    setSavedJobs(savedData.count);
-    setApplications(appsData.count);
+    if (profileResult.status === "fulfilled") {
+      setProfile(profileResult.value.data);
+    } else {
+      console.error("Error fetching profile data:", profileResult.reason);
+    }
 
-  } catch (err) {
-    console.error("Error fetching profile data:", err);
+    if (savedResult.status === "fulfilled") {
+      setSavedJobs(savedResult.value.data.count);
+    } else {
+      console.error("Error fetching saved jobs count:", savedResult.reason);
+    }
+
+    if (appsResult.status === "fulfilled") {
+      setApplications(appsResult.value.data.count);
+    } else {
+      console.error("Error fetching applications count:", appsResult.reason);
+    }
   } finally {
     setLoading(false);
   }

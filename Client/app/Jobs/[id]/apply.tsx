@@ -15,17 +15,95 @@ import { Ionicons } from "@expo/vector-icons";
 import { useThemeColors } from "@/hooks/useThemeColor";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { apiClient } from "@/constants/apiClient";
+import { useAuth } from "@/context/authContext";
+import * as DocumentPicker from "expo-document-picker";
 
 export default function ApplyJob() {
-  const { id } = useLocalSearchParams<{ id: string }>(); // jobId
+  const { id } = useLocalSearchParams<{ id: string | string[] }>(); // jobId
+  const jobId = Array.isArray(id) ? id[0] : id;
   const router = useRouter();
   const { colors } = useThemeColors("sage");
+  const { user } = useAuth();
+
+  const MAX_RESUME_BYTES = 5 * 1024 * 1024;
+  const ALLOWED_MIME_TYPES = new Set([
+    "application/pdf",
+    "application/msword",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  ]);
 
   const [coverLetter, setCoverLetter] = useState("");
-  const [resume, setResume] = useState(""); // URL or filename for now
+  const [resume, setResume] = useState(""); // mock URL for now
+  const [resumeLabel, setResumeLabel] = useState<string | null>(null);
+  const [resumeSizeLabel, setResumeSizeLabel] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+
+  const resetResume = () => {
+    setResume("");
+    setResumeLabel(null);
+    setResumeSizeLabel(null);
+  };
+
+  const mockUploadResume = async () => {
+    if (!jobId) {
+      Alert.alert("Missing Job", "Unable to upload a resume without a job ID.");
+      return;
+    }
+
+    try {
+      const pickResult = await DocumentPicker.getDocumentAsync({
+        type: ["application/pdf", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"],
+        multiple: false,
+        copyToCacheDirectory: true,
+      });
+
+      if (pickResult.canceled) {
+        return;
+      }
+
+      const file = pickResult.assets?.[0];
+      if (!file) {
+        Alert.alert("Upload failed", "No file selected.");
+        return;
+      }
+
+      const fileName = file.name ?? "resume.pdf";
+      setResumeLabel(fileName);
+      setResumeSizeLabel(typeof file.size === "number" ? `${Math.round(file.size / 1024)} KB` : null);
+
+      if (file.mimeType && !ALLOWED_MIME_TYPES.has(file.mimeType)) {
+        Alert.alert("Unsupported file", "Please select a PDF or Word document.");
+        setResume("");
+        return;
+      }
+
+      if (typeof file.size === "number" && file.size > MAX_RESUME_BYTES) {
+        Alert.alert("File too large", "Please choose a file under 5 MB.");
+        setResume("");
+        return;
+      }
+
+      setIsUploading(true);
+
+      await new Promise((resolve) => setTimeout(resolve, 900));
+      const filename = `resume_${Date.now()}.pdf`;
+      const mockUrl = `supabase://resumes/${user?._id ?? "anon"}/${jobId}/${filename}`;
+      setResume(mockUrl);
+      Alert.alert("Upload complete", "Mock resume uploaded to Supabase storage.");
+    } catch (error: any) {
+      Alert.alert("Upload failed", error?.message ?? "Unable to upload resume.");
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   const handleApply = async () => {
+    if (!jobId) {
+      Alert.alert("Missing Job", "Unable to submit an application without a job ID.");
+      return;
+    }
+
     if (!coverLetter.trim() && !resume.trim()) {
       Alert.alert("Missing Information", "Please provide at least a cover letter or a resume.");
       return;
@@ -42,7 +120,7 @@ export default function ApplyJob() {
       }
 
       await apiClient.post("/applications", {
-        jobId: id,
+        jobId,
         coverLetter,
         resume,
       });
@@ -100,22 +178,40 @@ export default function ApplyJob() {
         </Text>
 
         <Text style={[styles.inputLabel, { color: colors.text }]}>
-          Resume (link or filename)
+          Resume (mock upload)
         </Text>
-        <TextInput
-          style={[
-            styles.input, 
-            { 
-              borderColor: colors.border,
-              color: colors.text,
-              backgroundColor: colors.cardBackground
-            }
-          ]}
-          placeholder="Paste a link to your resume or upload later"
-          placeholderTextColor={colors.placeholder}
-          value={resume}
-          onChangeText={setResume}
-        />
+        <View style={[styles.uploadRow, { borderColor: colors.border, backgroundColor: colors.cardBackground }]}>
+          <View style={styles.uploadInfo}>
+            <Text style={[styles.uploadLabel, { color: colors.text }]}>
+              {resumeLabel ?? "No resume uploaded"}
+            </Text>
+            <Text style={[styles.uploadHint, { color: colors.placeholder }]}>
+              {resumeSizeLabel ? `${resumeSizeLabel} • ` : ""}Stored in mock Supabase path
+            </Text>
+          </View>
+          <View style={styles.uploadActions}>
+            <TouchableOpacity
+              style={[styles.uploadButton, { backgroundColor: colors.tint, opacity: isUploading ? 0.7 : 1 }]}
+              onPress={mockUploadResume}
+              disabled={isUploading}
+            >
+              {isUploading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text style={styles.uploadButtonText}>Upload CV</Text>
+              )}
+            </TouchableOpacity>
+            {resumeLabel ? (
+              <TouchableOpacity
+                style={[styles.removeButton, { borderColor: colors.border }]}
+                onPress={resetResume}
+                disabled={isUploading}
+              >
+                <Text style={[styles.removeButtonText, { color: colors.text }]}>Remove</Text>
+              </TouchableOpacity>
+            ) : null}
+          </View>
+        </View>
 
         <TouchableOpacity
           style={[
@@ -165,6 +261,50 @@ const styles = StyleSheet.create({
   },
   coverLetter: { height: 120 },
   characterCount: { fontSize: 12, marginTop: 4 },
+  uploadRow: {
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 12,
+  },
+  uploadInfo: {
+    flex: 1,
+  },
+  uploadLabel: {
+    fontSize: 14,
+    fontWeight: "600",
+  },
+  uploadHint: {
+    fontSize: 12,
+    marginTop: 4,
+  },
+  uploadActions: {
+    gap: 8,
+  },
+  uploadButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    borderRadius: 8,
+  },
+  uploadButtonText: {
+    color: "#fff",
+    fontSize: 13,
+    fontWeight: "600",
+  },
+  removeButton: {
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    alignItems: "center",
+  },
+  removeButtonText: {
+    fontSize: 12,
+    fontWeight: "600",
+  },
   submitButton: {
     marginTop: 20,
     padding: 14,
