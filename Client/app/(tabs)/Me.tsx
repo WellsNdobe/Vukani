@@ -86,7 +86,7 @@ export default function Profile() {
           <View
             style={[
               styles.avatarContainer,
-              { backgroundColor: colors.cardBackground },
+              { backgroundColor: colors.divider },
             ]}
           >
             <Ionicons
@@ -129,7 +129,7 @@ export default function Profile() {
         <View
           style={[
             styles.statsContainer,
-            { backgroundColor: colors.cardBackground },
+            { backgroundColor: colors.divider },
           ]}
         >
           <View style={styles.statItem}>
@@ -192,7 +192,7 @@ export default function Profile() {
         <TouchableOpacity
           style={[
             styles.logoutButton,
-            { backgroundColor: colors.cardBackground },
+            { backgroundColor: colors.divider },
           ]}
           onPress={handleLogout}
           activeOpacity={0.8}

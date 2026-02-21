@@ -96,7 +96,7 @@ export default function JobDetails() {
       </View>
 
       <View style={styles.jobHeader}>
-        <View style={[styles.logoPlaceholder, { backgroundColor: colors.cardBackground }]}>
+        <View style={[styles.logoPlaceholder, { backgroundColor: colors.divider }]}>
           <MaterialIcons name="business-center" size={32} color={colors.tint} />
         </View>
 
@@ -106,21 +106,21 @@ export default function JobDetails() {
 
           <View style={styles.jobDetails}>
             {job.location && (
-              <View style={[styles.detailItem, { backgroundColor: colors.cardBackground }]}>
+              <View style={[styles.detailItem, { backgroundColor: colors.divider }]}>
                 <Ionicons name="location-outline" size={14} color={colors.icon} />
                 <Text style={[styles.detailText, { color: colors.icon }]}>{job.location}</Text>
               </View>
             )}
 
             {job.salary && (
-              <View style={[styles.detailItem, { backgroundColor: colors.cardBackground }]}>
+              <View style={[styles.detailItem, { backgroundColor: colors.divider }]}>
                 <Ionicons name="cash-outline" size={14} color={colors.icon} />
                 <Text style={[styles.detailText, { color: colors.icon }]}>{job.salary}</Text>
               </View>
             )}
 
             {job.jobType && (
-              <View style={[styles.detailItem, { backgroundColor: colors.cardBackground }]}>
+              <View style={[styles.detailItem, { backgroundColor: colors.divider }]}>
                 <Ionicons name="time-outline" size={14} color={colors.icon} />
                 <Text style={[styles.detailText, { color: colors.icon }]}>{job.jobType}</Text>
               </View>
@@ -133,7 +133,7 @@ export default function JobDetails() {
         <Image source={{ uri: job.jobImage }} style={styles.hero} resizeMode="cover" />
       ) : null}
 
-      <View style={[styles.dateContainer, { backgroundColor: colors.cardBackground }]}>
+      <View style={[styles.dateContainer, { backgroundColor: colors.divider }]}>
         <Ionicons name="calendar-outline" size={16} color={colors.icon} />
         <Text style={[styles.dateText, { color: colors.icon }]}>Posted on {formatDate(job.timestamp)}</Text>
       </View>
