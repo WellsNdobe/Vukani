@@ -16,7 +16,7 @@ import { apiClient } from "@/constants/apiClient";
 
 export default function SignUpScreen() {
   const router = useRouter();
-  const { colors } = useThemeColors("nude");
+  const { colors } = useThemeColors("sage");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -52,15 +52,6 @@ const handleSignUp = async () => {
   const handleSocialSignUp = (provider: string) => {
     console.log(`Signing up with ${provider}`);
     router.replace("/Auth/login");
-  };
-
-  // Complementary colors for the nude theme
-  const complementaryColors = {
-    inputBorder: "#d4b499", // lighter clay
-    buttonPressed: "#b38a63", // darker clay
-    placeholder: "#8c6b5a", // muted brown
-    error: "#e76f51", // soft red for errors
-    divider: "#d9c8b8", // light clay divider
   };
 
   return (
@@ -105,16 +96,16 @@ const handleSignUp = async () => {
           <View
             style={[
               styles.dividerLine,
-              { backgroundColor: complementaryColors.divider },
+              { backgroundColor: colors.divider },
             ]}
           />
-          <Text style={[styles.dividerText, { color: complementaryColors.placeholder }]}>
+          <Text style={[styles.dividerText, { color: colors.placeholder }]}>
             or
           </Text>
           <View
             style={[
               styles.dividerLine,
-              { backgroundColor: complementaryColors.divider },
+              { backgroundColor: colors.divider },
             ]}
           />
         </View>
@@ -127,13 +118,13 @@ const handleSignUp = async () => {
               {
                 borderColor: isNameFocused
                   ? colors.tint
-                  : complementaryColors.inputBorder,
+                  : colors.border,
                 color: colors.text,
                 backgroundColor: colors.background,
               },
             ]}
             placeholder="Full Name"
-            placeholderTextColor={complementaryColors.placeholder}
+            placeholderTextColor={colors.placeholder}
             value={name}
             onChangeText={setName}
             onFocus={() => setIsNameFocused(true)}
@@ -147,13 +138,13 @@ const handleSignUp = async () => {
               {
                 borderColor: isEmailFocused
                   ? colors.tint
-                  : complementaryColors.inputBorder,
+                  : colors.border,
                 color: colors.text,
                 backgroundColor: colors.background,
               },
             ]}
             placeholder="Email"
-            placeholderTextColor={complementaryColors.placeholder}
+            placeholderTextColor={colors.placeholder}
             value={email}
             onChangeText={setEmail}
             onFocus={() => setIsEmailFocused(true)}
@@ -169,13 +160,13 @@ const handleSignUp = async () => {
                 {
                   borderColor: isPasswordFocused
                     ? colors.tint
-                    : complementaryColors.inputBorder,
+                    : colors.border,
                   color: colors.text,
                   backgroundColor: colors.background,
                 },
               ]}
               placeholder="Password"
-              placeholderTextColor={complementaryColors.placeholder}
+              placeholderTextColor={colors.placeholder}
               value={password}
               onChangeText={setPassword}
               secureTextEntry={!showPassword}
@@ -189,7 +180,7 @@ const handleSignUp = async () => {
               <MaterialCommunityIcons
                 name={showPassword ? "eye-off" : "eye"}
                 size={20}
-                color={complementaryColors.placeholder}
+                color={colors.placeholder}
               />
             </TouchableOpacity>
           </View>
@@ -201,13 +192,13 @@ const handleSignUp = async () => {
                 {
                   borderColor: isConfirmFocused
                     ? colors.tint
-                    : complementaryColors.inputBorder,
+                    : colors.border,
                   color: colors.text,
                   backgroundColor: colors.background,
                 },
               ]}
               placeholder="Confirm Password"
-              placeholderTextColor={complementaryColors.placeholder}
+              placeholderTextColor={colors.placeholder}
               value={confirmPassword}
               onChangeText={setConfirmPassword}
               secureTextEntry={!showConfirmPassword}
@@ -221,7 +212,7 @@ const handleSignUp = async () => {
               <MaterialCommunityIcons
                 name={showConfirmPassword ? "eye-off" : "eye"}
                 size={20}
-                color={complementaryColors.placeholder}
+                color={colors.placeholder}
               />
             </TouchableOpacity>
           </View>
@@ -237,7 +228,7 @@ const handleSignUp = async () => {
         </View>
 
         {/* Terms and Privacy */}
-        <Text style={[styles.termsText, { color: complementaryColors.placeholder }]}>
+        <Text style={[styles.termsText, { color: colors.placeholder }]}>
           By signing up, you agree to our 
           <Text style={{ color: colors.tint }}> Terms of Service</Text> and 
           <Text style={{ color: colors.tint }}> Privacy Policy</Text>
@@ -245,7 +236,7 @@ const handleSignUp = async () => {
 
         {/* Login Link */}
         <View style={styles.loginContainer}>
-          <Text style={{ color: complementaryColors.placeholder }}>
+          <Text style={{ color: colors.placeholder }}>
             Already have an account?{" "}
           </Text>
           <TouchableOpacity onPress={() => router.replace("/Auth/login")}>
