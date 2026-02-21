@@ -1,6 +1,7 @@
 // app/Jobs/[id].tsx
 import { ActivityIndicator } from "react-native";
 import { useEffect } from "react";
+import { apiClient } from "@/constants/apiClient";
 import { useThemeColors } from "../../hooks/useThemeColor";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -36,9 +37,7 @@ export default function JobDetails() {
 
     const fetchJob = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/jobs/${jobId}`);
-        if (!res.ok) throw new Error("Failed to fetch job");
-        const data = await res.json();
+        const { data } = await apiClient.get(`/jobs/${jobId}`);
         setJob(data);
       } catch (error: any) {
         console.error(error);

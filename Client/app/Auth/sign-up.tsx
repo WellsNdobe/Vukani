@@ -12,7 +12,7 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
-import axios from "axios";
+import { apiClient } from "@/constants/apiClient";
 
 export default function SignUpScreen() {
   const router = useRouter();
@@ -35,7 +35,7 @@ const handleSignUp = async () => {
   }
 
   try {
-    const res = await axios.post("http://localhost:5000/auth/register", {
+    await apiClient.post("/auth/register", {
       name,
       email,
       password,

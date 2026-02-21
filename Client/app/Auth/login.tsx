@@ -13,7 +13,7 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
-import axios from "axios";
+import { apiClient } from "@/constants/apiClient";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function LoginScreen() {
@@ -27,7 +27,7 @@ export default function LoginScreen() {
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
 const handleLogin = async () => {
   try {
-    const res = await axios.post("http://localhost:5000/auth/login", {
+    const res = await apiClient.post("/auth/login", {
       email,
       password,
     });
@@ -186,7 +186,7 @@ const handleLogin = async () => {
         {/* Sign Up Link */}
         <View style={styles.signupContainer}>
           <Text style={{ color: complementaryColors.placeholder }}>
-            Don't have an account?{" "}
+            Do not have an account?{" "}
           </Text>
           <TouchableOpacity onPress={() => router.push("/Auth/sign-up")}>
             <Text style={{ color: colors.tint, fontWeight: "600" }}>Sign up</Text>
