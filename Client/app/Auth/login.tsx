@@ -19,7 +19,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 export default function LoginScreen() {
   const { login } = useAuth();
   const router = useRouter();
-  const { colors } = useThemeColors("nude");
+  const { colors } = useThemeColors("sage");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -51,15 +51,6 @@ const handleLogin = async () => {
   const handleSocialLogin = (provider: string) => {
     console.log(`Logging in with ${provider}`);
     handleLogin();
-  };
-
-  // Complementary colors for the nude theme
-  const complementaryColors = {
-    inputBorder: "#d4b499", // lighter clay
-    buttonPressed: "#b38a63", // darker clay
-    placeholder: "#8c6b5a", // muted brown
-    error: "#e76f51", // soft red for errors
-    divider: "#d9c8b8", // light clay divider
   };
 
   return (
@@ -104,16 +95,16 @@ const handleLogin = async () => {
           <View
             style={[
               styles.dividerLine,
-              { backgroundColor: complementaryColors.divider },
+              { backgroundColor: colors.divider },
             ]}
           />
-          <Text style={[styles.dividerText, { color: complementaryColors.placeholder }]}>
+          <Text style={[styles.dividerText, { color: colors.placeholder }]}>
             or
           </Text>
           <View
             style={[
               styles.dividerLine,
-              { backgroundColor: complementaryColors.divider },
+              { backgroundColor: colors.divider },
             ]}
           />
         </View>
@@ -126,13 +117,13 @@ const handleLogin = async () => {
               {
                 borderColor: isEmailFocused
                   ? colors.tint
-                  : complementaryColors.inputBorder,
+                  : colors.border,
                 color: colors.text,
                 backgroundColor: colors.background,
               },
             ]}
             placeholder="Email"
-            placeholderTextColor={complementaryColors.placeholder}
+            placeholderTextColor={colors.placeholder}
             value={email}
             onChangeText={setEmail}
             onFocus={() => setIsEmailFocused(true)}
@@ -148,13 +139,13 @@ const handleLogin = async () => {
                 {
                   borderColor: isPasswordFocused
                     ? colors.tint
-                    : complementaryColors.inputBorder,
+                    : colors.border,
                   color: colors.text,
                   backgroundColor: colors.background,
                 },
               ]}
               placeholder="Password"
-              placeholderTextColor={complementaryColors.placeholder}
+              placeholderTextColor={colors.placeholder}
               value={password}
               onChangeText={setPassword}
               secureTextEntry={!showPassword}
@@ -168,7 +159,7 @@ const handleLogin = async () => {
               <MaterialCommunityIcons
                 name={showPassword ? "eye-off" : "eye"}
                 size={20}
-                color={complementaryColors.placeholder}
+                color={colors.placeholder}
               />
             </TouchableOpacity>
           </View>
@@ -185,7 +176,7 @@ const handleLogin = async () => {
 
         {/* Sign Up Link */}
         <View style={styles.signupContainer}>
-          <Text style={{ color: complementaryColors.placeholder }}>
+          <Text style={{ color: colors.placeholder }}>
             Do not have an account?{" "}
           </Text>
           <TouchableOpacity onPress={() => router.push("/Auth/sign-up")}>

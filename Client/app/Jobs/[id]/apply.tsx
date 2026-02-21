@@ -19,18 +19,11 @@ import { apiClient } from "@/constants/apiClient";
 export default function ApplyJob() {
   const { id } = useLocalSearchParams<{ id: string }>(); // jobId
   const router = useRouter();
-  const { colors } = useThemeColors("nude");
+  const { colors } = useThemeColors("sage");
 
   const [coverLetter, setCoverLetter] = useState("");
   const [resume, setResume] = useState(""); // URL or filename for now
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  // Complementary colors for the nude theme
-  const complementaryColors = {
-    inputBorder: "#d4b499",
-    placeholder: "#8c6b5a",
-    cardBackground: "#f8f4f0",
-  };
 
   const handleApply = async () => {
     if (!coverLetter.trim() && !resume.trim()) {
@@ -64,7 +57,7 @@ export default function ApplyJob() {
   };
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: "#fff" }]}>
+    <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
@@ -88,13 +81,13 @@ export default function ApplyJob() {
             styles.input, 
             styles.coverLetter, 
             { 
-              borderColor: complementaryColors.inputBorder,
+              borderColor: colors.border,
               color: colors.text,
-              backgroundColor: "#fff"
+              backgroundColor: colors.cardBackground
             }
           ]}
           placeholder="Tell us why you're the perfect candidate..."
-          placeholderTextColor={complementaryColors.placeholder}
+          placeholderTextColor={colors.placeholder}
           value={coverLetter}
           onChangeText={setCoverLetter}
           multiline
@@ -102,7 +95,7 @@ export default function ApplyJob() {
           maxLength={1000}
         />
         
-        <Text style={[styles.characterCount, { color: complementaryColors.placeholder }]}>
+        <Text style={[styles.characterCount, { color: colors.placeholder }]}>
           {coverLetter.length}/1000 characters
         </Text>
 
@@ -113,13 +106,13 @@ export default function ApplyJob() {
           style={[
             styles.input, 
             { 
-              borderColor: complementaryColors.inputBorder,
+              borderColor: colors.border,
               color: colors.text,
-              backgroundColor: "#fff"
+              backgroundColor: colors.cardBackground
             }
           ]}
           placeholder="Paste a link to your resume or upload later"
-          placeholderTextColor={complementaryColors.placeholder}
+          placeholderTextColor={colors.placeholder}
           value={resume}
           onChangeText={setResume}
         />
@@ -142,7 +135,7 @@ export default function ApplyJob() {
           )}
         </TouchableOpacity>
         
-        <Text style={[styles.footerNote, { color: complementaryColors.placeholder }]}>
+        <Text style={[styles.footerNote, { color: colors.placeholder }]}>
           Your application will be reviewed by our hiring team. 
           We will contact you via email if you are selected for an interview.
         </Text>

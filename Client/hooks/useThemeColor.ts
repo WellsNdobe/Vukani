@@ -1,20 +1,17 @@
-// hooks/useThemeColors.ts
-import { Colors } from "@/constants/Colors";
+import { Colors, ThemeName } from "@/constants/Colors";
 import { useState } from "react";
 import { useColorScheme } from "react-native";
 
-type ThemeMode = "light" | "dark" | "nude";
+export function useThemeColors(preferred?: ThemeName) {
+  const systemScheme = useColorScheme();
+  const [customScheme, setCustomScheme] = useState<ThemeName | null>(null);
 
-export function useThemeColors(preferred?: ThemeMode) {
-  const systemScheme = useColorScheme(); // "light" | "dark" | null
-  const [customScheme, setCustomScheme] = useState<ThemeMode | null>(null);
-
-  // Decide which theme to use
-  const theme: ThemeMode = customScheme || preferred || (systemScheme === "dark" ? "dark" : "light");
+  const theme: ThemeName =
+    customScheme || preferred || (systemScheme === "dark" ? "dark" : "light");
 
   return {
     colors: Colors[theme],
-    setTheme: setCustomScheme, // allows you to toggle manually
+    setTheme: setCustomScheme,
     theme,
   };
 }
