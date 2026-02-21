@@ -1,40 +1,54 @@
 // app/messages/[id].tsx
+import { useThemeColors } from '@/hooks/useThemeColor';
 import { messages } from '@/data/messages';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useMemo, useState } from 'react';
 import {
-    FlatList,
-    Image,
-    KeyboardAvoidingView, Platform,
-    SafeAreaView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  FlatList,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
+
+type ChatMessage = {
+  id: string;
+  text: string;
+  timestamp: string;
+  from: 'you' | 'company';
+};
 
 export default function MessageDetail() {
   const router = useRouter();
+  const { colors } = useThemeColors('sage');
   const params = useLocalSearchParams<{ id?: string }>();
   const id = params.id ?? '';
   const message = useMemo(() => messages.find((m) => m.id === id), [id]);
 
-  const [replies, setReplies] = useState<{ id: string; text: string; timestamp: string; from: 'you' | 'company' }[]>([]);
+  const [replies, setReplies] = useState<ChatMessage[]>([]);
   const [replyText, setReplyText] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
 
   if (!message) {
     return (
-      <SafeAreaView style={styles.notFoundContainer}>
-        <Text style={styles.notFoundText}>Message not found</Text>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Text style={styles.backText}>Back</Text>
+      <SafeAreaView style={[styles.notFoundContainer, { backgroundColor: colors.background }]}> 
+        <Text style={[styles.notFoundText, { color: colors.text }]}>Message not found</Text>
+        <TouchableOpacity
+          onPress={() => router.back()}
+          style={[styles.backButton, { backgroundColor: colors.tint }]}
+        >
+          <Text style={styles.backTextButton}>Back</Text>
         </TouchableOpacity>
       </SafeAreaView>
     );
   }
 
-  const conversation = [
+  const conversation: ChatMessage[] = [
     { id: `company-${message.id}`, text: message.lastMessage, timestamp: message.timestamp, from: 'company' },
     ...replies,
   ];
@@ -42,27 +56,39 @@ export default function MessageDetail() {
   const sendReply = () => {
     const text = replyText.trim();
     if (!text) return;
-    const newReply = { id: `you-${Date.now()}`, text, timestamp: 'now', from: 'you' } as const;
+
+    const newReply: ChatMessage = {
+      id: `you-${Date.now()}`,
+      text,
+      timestamp: 'now',
+      from: 'you',
+    };
+
     setReplies((r) => [...r, newReply]);
     setReplyText('');
   };
 
   return (
-    <SafeAreaView style={styles.wrapper}>
-      <View style={styles.header}>
+    <SafeAreaView style={[styles.wrapper, { backgroundColor: colors.background }]}> 
+      <View style={[styles.header, { borderBottomColor: colors.separator }]}> 
         <TouchableOpacity onPress={() => router.back()} style={styles.backArea}>
-          <Text style={styles.backText}>Back</Text>
+          <Text style={[styles.backText, { color: colors.tint }]}>Back</Text>
         </TouchableOpacity>
 
         <View style={styles.headerCenter}>
           <Image source={{ uri: message.companyLogo }} style={styles.headerLogo} />
-          <View style={{ marginLeft: 10 }}>
-            <Text style={styles.company}>{message.companyName}</Text>
-            <Text style={styles.time}>{message.timestamp}</Text>
+          <View style={styles.headerMeta}>
+            <Text style={[styles.company, { color: colors.text }]}>{message.companyName}</Text>
+            <Text style={[styles.time, { color: colors.placeholder }]}>{message.timestamp}</Text>
           </View>
         </View>
 
-        <View style={{ width: 56 }} />
+        <TouchableOpacity
+          style={[styles.typingToggle, { borderColor: colors.border, backgroundColor: isTyping ? colors.divider : colors.cardBackground }]}
+          onPress={() => setIsTyping((prev) => !prev)}
+        >
+          <Text style={[styles.typingToggleText, { color: colors.tint }]}>{isTyping ? 'Typing On' : 'Typing Test'}</Text>
+        </TouchableOpacity>
       </View>
 
       <FlatList
@@ -74,19 +100,52 @@ export default function MessageDetail() {
           return (
             <View style={[styles.bubbleRow, isYou ? styles.bubbleRowRight : styles.bubbleRowLeft]}>
               {!isYou && <Image source={{ uri: message.companyLogo }} style={styles.bubbleLogo} />}
-              <View style={[styles.bubble, isYou ? styles.bubbleYou : styles.bubbleCompany]}>
-                <Text style={isYou ? styles.bubbleTextYou : styles.bubbleTextCompany}>{item.text}</Text>
-                <Text style={styles.bubbleTimestamp}>{item.timestamp}</Text>
+              <View
+                style={[
+                  styles.bubble,
+                  isYou
+                    ? [styles.bubbleYou, { backgroundColor: colors.tint }]
+                    : [styles.bubbleCompany, { backgroundColor: colors.divider, borderColor: colors.border }],
+                ]}
+              >
+                <Text style={isYou ? styles.bubbleTextYou : [styles.bubbleTextCompany, { color: colors.text }]}>
+                  {item.text}
+                </Text>
+                <Text style={[styles.bubbleTimestamp, { color: isYou ? '#E8FFF2' : colors.placeholder }]}>
+                  {item.timestamp}
+                </Text>
               </View>
             </View>
           );
         }}
+        ListFooterComponent={
+          isTyping ? (
+            <View style={[styles.typingWrap, { borderColor: colors.border, backgroundColor: colors.cardBackground }]}>
+              <Image source={{ uri: message.companyLogo }} style={styles.typingLogo} />
+              <View style={[styles.typingBubble, { backgroundColor: colors.divider }]}>
+                <Text style={[styles.typingText, { color: colors.placeholder }]}>{message.companyName} is typing...</Text>
+              </View>
+            </View>
+          ) : null
+        }
       />
 
-      <KeyboardAvoidingView behavior={Platform.select({ ios: 'padding', android: undefined })} keyboardVerticalOffset={Platform.select({ ios: 90, android: 0 })}>
-        <View style={styles.composer}>
-          <TextInput style={styles.input} placeholder="Write a reply..." value={replyText} onChangeText={setReplyText} multiline />
-          <TouchableOpacity style={styles.sendButton} onPress={sendReply}><Text style={styles.sendText}>Send</Text></TouchableOpacity>
+      <KeyboardAvoidingView
+        behavior={Platform.select({ ios: 'padding', android: undefined })}
+        keyboardVerticalOffset={Platform.select({ ios: 90, android: 0 })}
+      >
+        <View style={[styles.composer, { borderTopColor: colors.separator, backgroundColor: colors.background }]}> 
+          <TextInput
+            style={[styles.input, { borderColor: colors.border, backgroundColor: colors.cardBackground, color: colors.text }]}
+            placeholder="Write a reply..."
+            placeholderTextColor={colors.placeholder}
+            value={replyText}
+            onChangeText={setReplyText}
+            multiline
+          />
+          <TouchableOpacity style={[styles.sendButton, { backgroundColor: colors.tint }]} onPress={sendReply}>
+            <Text style={styles.sendText}>Send</Text>
+          </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -94,40 +153,81 @@ export default function MessageDetail() {
 }
 
 const styles = StyleSheet.create({
-  wrapper: { flex: 1, backgroundColor: '#fff' },
-  header: { height: 72, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, borderBottomWidth: 1, borderBottomColor: '#f0f0f0' },
-  backArea: { width: 56 },
-  backText: { color: '#007AFF', fontWeight: '600' },
+  wrapper: { flex: 1 },
+  header: {
+    minHeight: 72,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    borderBottomWidth: 1,
+  },
+  backArea: { width: 52 },
+  backText: { fontWeight: '600' },
   headerCenter: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' },
   headerLogo: { width: 40, height: 40, borderRadius: 8 },
-  company: { fontSize: 16, fontWeight: '700', color: '#222' },
-  time: { fontSize: 12, color: '#888' },
+  headerMeta: { marginLeft: 10 },
+  company: { fontSize: 16, fontWeight: '700' },
+  time: { fontSize: 12 },
+  typingToggle: {
+    borderWidth: 1,
+    borderRadius: 16,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+  },
+  typingToggleText: { fontSize: 11, fontWeight: '700' },
   convoContainer: { paddingHorizontal: 12, paddingVertical: 16, paddingBottom: 120 },
 
   bubbleRow: { flexDirection: 'row', marginBottom: 12, alignItems: 'flex-end' },
   bubbleRowLeft: { justifyContent: 'flex-start' },
   bubbleRowRight: { justifyContent: 'flex-end' },
   bubbleLogo: { width: 36, height: 36, borderRadius: 8, marginRight: 8 },
-  backButton: {
-  flexDirection: 'row',
-  alignItems: 'center',
-  paddingHorizontal: 12,
-  paddingVertical: 8,
-  borderRadius: 20,
-},
 
-  bubble: { maxWidth: '78%', padding: 10, borderRadius: 12 },
-  bubbleCompany: { backgroundColor: '#f2f2f2', borderTopLeftRadius: 4 },
-  bubbleYou: { backgroundColor: '#007AFF', borderTopRightRadius: 4 },
-  bubbleTextCompany: { color: '#222', fontSize: 15 },
+  bubble: { maxWidth: '78%', padding: 10, borderRadius: 14 },
+  bubbleCompany: { borderTopLeftRadius: 4, borderWidth: 1 },
+  bubbleYou: { borderTopRightRadius: 4 },
+  bubbleTextCompany: { fontSize: 15 },
   bubbleTextYou: { color: '#fff', fontSize: 15 },
-  bubbleTimestamp: { marginTop: 6, fontSize: 11, color: '#666', alignSelf: 'flex-end' },
+  bubbleTimestamp: { marginTop: 6, fontSize: 11, alignSelf: 'flex-end' },
 
-  composer: { paddingHorizontal: 12, paddingVertical: 10, borderTopWidth: 1, borderTopColor: '#f0f0f0', flexDirection: 'row', alignItems: 'flex-end', backgroundColor: '#fff' },
-  input: { flex: 1, maxHeight: 120, minHeight: 40, paddingHorizontal: 12, paddingVertical: 8, borderRadius: 10, borderWidth: 1, borderColor: '#eee', backgroundColor: '#fafafa' },
-  sendButton: { marginLeft: 8, backgroundColor: '#007AFF', paddingHorizontal: 14, paddingVertical: 10, borderRadius: 8 },
+  typingWrap: {
+    marginTop: 4,
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderRadius: 12,
+    padding: 8,
+    alignSelf: 'flex-start',
+  },
+  typingLogo: { width: 28, height: 28, borderRadius: 7, marginRight: 8 },
+  typingBubble: { borderRadius: 10, paddingHorizontal: 10, paddingVertical: 8 },
+  typingText: { fontSize: 12, fontWeight: '500' },
+
+  composer: {
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderTopWidth: 1,
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+  },
+  input: {
+    flex: 1,
+    maxHeight: 120,
+    minHeight: 40,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 10,
+    borderWidth: 1,
+  },
+  sendButton: { marginLeft: 8, paddingHorizontal: 14, paddingVertical: 10, borderRadius: 10 },
   sendText: { color: '#fff', fontWeight: '700' },
 
   notFoundContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  notFoundText: { fontSize: 18, color: '#222', marginBottom: 12 },
+  notFoundText: { fontSize: 18, marginBottom: 12 },
+  backButton: {
+    alignItems: 'center',
+    paddingHorizontal: 14,
+    paddingVertical: 9,
+    borderRadius: 20,
+  },
+  backTextButton: { color: '#fff', fontWeight: '700' },
 });
