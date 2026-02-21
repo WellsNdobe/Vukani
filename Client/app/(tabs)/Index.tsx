@@ -4,10 +4,12 @@ import JobPost from "@/components/JobPost";
 import React, { useEffect, useState } from "react";
 import { ActivityIndicator, Alert, ScrollView, View } from "react-native";
 import { apiClient } from "@/constants/apiClient";
+import { useAuth } from "@/context/authContext";
 
 export default function Home() {
   const [jobs, setJobs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetchJobs = async () => {
@@ -39,10 +41,10 @@ export default function Home() {
       <ScrollView contentContainerStyle={{ padding: 16 }}>
         {jobs.map((job) => (
           <JobPost
-            key={job.id}
+            key={job._id}
             {...job}
+            userId={user?._id}
             onApply={() => alert(`Applied to ${job.jobTitle}`)}
-            onSave={() => alert(`Saved ${job.jobTitle}`)}
             onHide={() => alert(`Hidden ${job.jobTitle}`)}
           />
         ))}
