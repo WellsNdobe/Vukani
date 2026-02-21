@@ -1,6 +1,7 @@
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useRef, useMemo } from "react";
+import { useThemeColors } from "@/hooks/useThemeColor";
 import {
   Alert,
   Animated,
@@ -55,17 +56,10 @@ export default function JobPost(props: JobPostProps) {
     [savedJobs, _id]
   );
 
-  // Nude theme colors
-  const colors = {
-    background: "#f8ede3",
-    cardBackground: "#fff9f0",
-    text: "#5c4033",
-    tint: "#d4a373",
-    icon: "#a67c52",
-    placeholder: "#c9ada7",
-    border: "#e0d7c9",
-    saveAction: "#8a9a5b",
-    hideAction: "#b56576",
+  const { colors } = useThemeColors("sage");
+  const actionColors = {
+    saveAction: colors.success,
+    hideAction: colors.destructive,
   };
 
   // Right action (Save)
@@ -83,7 +77,7 @@ export default function JobPost(props: JobPostProps) {
           styles.rightAction,
           {
             transform: [{ translateX: trans }],
-            backgroundColor: colors.saveAction,
+            backgroundColor: actionColors.saveAction,
           },
         ]}
       >
@@ -126,7 +120,7 @@ export default function JobPost(props: JobPostProps) {
           styles.leftAction,
           {
             transform: [{ translateX: trans }],
-            backgroundColor: colors.hideAction,
+            backgroundColor: actionColors.hideAction,
           },
         ]}
       >
@@ -189,7 +183,7 @@ export default function JobPost(props: JobPostProps) {
             {companyLogo ? (
               <Image source={{ uri: companyLogo }} style={styles.logo} />
             ) : (
-              <View style={[styles.logo, { backgroundColor: "#f0e6d8" }]}>
+              <View style={[styles.logo, { backgroundColor: colors.divider }]}>
                 <MaterialIcons
                   name="business-center"
                   size={24}
@@ -217,7 +211,7 @@ export default function JobPost(props: JobPostProps) {
           {/* Job Details Row */}
           <View style={styles.detailsRow}>
             {location && (
-              <View style={styles.detailItem}>
+              <View style={[styles.detailItem, { backgroundColor: colors.divider }]}>
                 <Ionicons name="location-outline" size={14} color={colors.icon} />
                 <Text style={[styles.detailText, { color: colors.icon }]}>
                   {location}
@@ -226,7 +220,7 @@ export default function JobPost(props: JobPostProps) {
             )}
 
             {salary && (
-              <View style={styles.detailItem}>
+              <View style={[styles.detailItem, { backgroundColor: colors.divider }]}>
                 <Ionicons name="cash-outline" size={14} color={colors.icon} />
                 <Text style={[styles.detailText, { color: colors.icon }]}>
                   {salary}
@@ -235,7 +229,7 @@ export default function JobPost(props: JobPostProps) {
             )}
 
             {jobType && (
-              <View style={styles.detailItem}>
+              <View style={[styles.detailItem, { backgroundColor: colors.divider }]}>
                 <Ionicons name="time-outline" size={14} color={colors.icon} />
                 <Text style={[styles.detailText, { color: colors.icon }]}>
                   {jobType}
@@ -325,7 +319,6 @@ const styles = StyleSheet.create({
   detailItem: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#f0e6d8",
     paddingVertical: 4,
     paddingHorizontal: 10,
     borderRadius: 12,

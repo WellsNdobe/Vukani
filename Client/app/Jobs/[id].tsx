@@ -1,12 +1,7 @@
 // app/Jobs/[id].tsx
-import { ActivityIndicator } from "react-native";
-import { useEffect } from "react";
-import { apiClient } from "@/constants/apiClient";
-import { useThemeColors } from "../../hooks/useThemeColor";
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
   Image,
   ScrollView,
@@ -15,22 +10,18 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { apiClient } from "@/constants/apiClient";
+import { useThemeColors } from "../../hooks/useThemeColor";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { useLocalSearchParams, useRouter } from "expo-router";
 
 export default function JobDetails() {
   const { id: jobId } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
-  const { colors } = useThemeColors("nude");
+  const { colors } = useThemeColors("sage");
   const [isSaved, setIsSaved] = useState(false);
   const [job, setJob] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  
-  // Complementary colors for the nude theme
-  const complementaryColors = {
-    cardBackground: "#f8f4f0", // Very light cream
-    border: "#e0d7c9",        // Light clay border
-    placeholder: "#8c6b5a",   // Muted brown
-    buttonPressed: "#b38a63", // Darker clay
-  };
 
   useEffect(() => {
     if (!jobId) return;
@@ -52,7 +43,7 @@ export default function JobDetails() {
 
   if (loading) {
     return (
-      <View style={[styles.center, { backgroundColor: "#fff" }]}>
+      <View style={[styles.center, { backgroundColor: colors.background }]}>
         <ActivityIndicator size="large" color={colors.tint} />
       </View>
     );
@@ -60,9 +51,9 @@ export default function JobDetails() {
 
   if (!job) {
     return (
-      <View style={[styles.center, { backgroundColor: "#fff" }]}>
+      <View style={[styles.center, { backgroundColor: colors.background }]}>
         <Text>Job not found</Text>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={[styles.backButton, { backgroundColor: colors.tint }]}
           onPress={() => router.back()}
         >
@@ -80,19 +71,17 @@ export default function JobDetails() {
     );
   };
 
-  // Format the timestamp to a readable date
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
     });
   };
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: "#fff" }]}>
-      {/* Header with back button and save */}
+    <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color={colors.text} />
@@ -106,14 +95,8 @@ export default function JobDetails() {
         </TouchableOpacity>
       </View>
 
-      {/* Job Header */}
       <View style={styles.jobHeader}>
-        <View
-          style={[
-            styles.logoPlaceholder,
-            { backgroundColor: complementaryColors.cardBackground },
-          ]}
-        >
+        <View style={[styles.logoPlaceholder, { backgroundColor: colors.cardBackground }]}>
           <MaterialIcons name="business-center" size={32} color={colors.tint} />
         </View>
 
@@ -123,76 +106,43 @@ export default function JobDetails() {
 
           <View style={styles.jobDetails}>
             {job.location && (
-              <View
-                style={[
-                  styles.detailItem,
-                  { backgroundColor: complementaryColors.cardBackground },
-                ]}
-              >
+              <View style={[styles.detailItem, { backgroundColor: colors.cardBackground }]}>
                 <Ionicons name="location-outline" size={14} color={colors.icon} />
-                <Text style={[styles.detailText, { color: colors.icon }]}>
-                  {job.location}
-                </Text>
+                <Text style={[styles.detailText, { color: colors.icon }]}>{job.location}</Text>
               </View>
             )}
 
             {job.salary && (
-              <View
-                style={[
-                  styles.detailItem,
-                  { backgroundColor: complementaryColors.cardBackground },
-                ]}
-              >
+              <View style={[styles.detailItem, { backgroundColor: colors.cardBackground }]}>
                 <Ionicons name="cash-outline" size={14} color={colors.icon} />
-                <Text style={[styles.detailText, { color: colors.icon }]}>
-                  {job.salary}
-                </Text>
+                <Text style={[styles.detailText, { color: colors.icon }]}>{job.salary}</Text>
               </View>
             )}
 
             {job.jobType && (
-              <View
-                style={[
-                  styles.detailItem,
-                  { backgroundColor: complementaryColors.cardBackground },
-                ]}
-              >
+              <View style={[styles.detailItem, { backgroundColor: colors.cardBackground }]}>
                 <Ionicons name="time-outline" size={14} color={colors.icon} />
-                <Text style={[styles.detailText, { color: colors.icon }]}>
-                  {job.jobType}
-                </Text>
+                <Text style={[styles.detailText, { color: colors.icon }]}>{job.jobType}</Text>
               </View>
             )}
           </View>
         </View>
       </View>
 
-      {/* Job Image */}
       {job.jobImage && job.jobImage !== "https://example.com/job-image.png" ? (
-        <Image 
-          source={{ uri: job.jobImage }} 
-          style={styles.hero} 
-          resizeMode="cover"
-        />
+        <Image source={{ uri: job.jobImage }} style={styles.hero} resizeMode="cover" />
       ) : null}
 
-      {/* Posted Date */}
-      <View style={[styles.dateContainer, { backgroundColor: complementaryColors.cardBackground }]}>
+      <View style={[styles.dateContainer, { backgroundColor: colors.cardBackground }]}>
         <Ionicons name="calendar-outline" size={16} color={colors.icon} />
-        <Text style={[styles.dateText, { color: colors.icon }]}>
-          Posted on {formatDate(job.timestamp)}
-        </Text>
+        <Text style={[styles.dateText, { color: colors.icon }]}>Posted on {formatDate(job.timestamp)}</Text>
       </View>
 
-      {/* Job Description */}
       <View style={styles.section}>
         <Text style={[styles.sectionTitle, { color: colors.text }]}>Job Description</Text>
-        <Text style={[styles.sectionText, { color: colors.text }]}>
-          {job.description}
-        </Text>
+        <Text style={[styles.sectionText, { color: colors.text }]}>{job.description}</Text>
       </View>
 
-      {/* Apply Button */}
       <TouchableOpacity
         style={[styles.applyButton, { backgroundColor: colors.tint }]}
         onPress={() => router.push(`/Jobs/${jobId}/apply`)}
@@ -205,14 +155,13 @@ export default function JobDetails() {
 }
 
 const styles = StyleSheet.create({
-  container: { 
-    flex: 1, 
-    backgroundColor: '#fff' 
+  container: {
+    flex: 1,
   },
-  center: { 
-    flex: 1, 
-    justifyContent: 'center', 
-    alignItems: 'center' 
+  center: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
   header: {
     flexDirection: "row",
@@ -226,102 +175,98 @@ const styles = StyleSheet.create({
   saveButton: {
     padding: 8,
   },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "600",
+  },
   jobHeader: {
-    flexDirection: 'row',
+    flexDirection: "row",
     paddingHorizontal: 16,
-    paddingBottom: 16,
+    marginBottom: 16,
   },
-  logoPlaceholder: { 
-    width: 80, 
-    height: 80, 
-    borderRadius: 16, 
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 16,
+  logoPlaceholder: {
+    width: 72,
+    height: 72,
+    borderRadius: 16,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 12,
   },
-  headerText: { 
+  headerText: {
     flex: 1,
-    justifyContent: 'center',
   },
-  title: { 
-    fontSize: 22, 
-    fontWeight: '700',
+  title: {
+    fontSize: 24,
+    fontWeight: "700",
     marginBottom: 4,
   },
-  category: { 
+  category: {
     fontSize: 16,
-    fontWeight: '500',
     marginBottom: 12,
   },
   jobDetails: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     gap: 8,
   },
   detailItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 10,
     paddingVertical: 6,
-    paddingHorizontal: 12,
     borderRadius: 12,
-    gap: 6,
+    gap: 4,
   },
   detailText: {
     fontSize: 13,
-    fontWeight: '500',
+    fontWeight: "500",
   },
-  hero: { 
-    width: '100%', 
-    height: 200, 
-    marginTop: 8,
-    marginBottom: 16,
+  hero: {
+    width: "100%",
+    height: 200,
+    marginBottom: 14,
   },
   dateContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 12,
-    borderRadius: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingVertical: 10,
     marginHorizontal: 16,
-    marginBottom: 24,
-    gap: 8,
+    borderRadius: 12,
+    marginBottom: 16,
+    gap: 6,
   },
   dateText: {
-    fontSize: 14,
-    fontWeight: '500',
+    fontSize: 13,
   },
   section: {
     paddingHorizontal: 16,
     marginBottom: 24,
   },
-  sectionTitle: { 
-    fontSize: 18, 
-    fontWeight: '700', 
-    marginBottom: 12,
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    marginBottom: 8,
   },
-  sectionText: { 
+  sectionText: {
     fontSize: 15,
     lineHeight: 22,
   },
   applyButton: {
-    flexDirection: 'row',
-    borderRadius: 16,
-    padding: 18,
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     marginHorizontal: 16,
-    marginBottom: 40,
-    marginTop: 16,
+    marginBottom: 26,
+    paddingVertical: 14,
+    borderRadius: 14,
   },
   applyText: {
-    color: '#fff',
+    color: "#fff",
+    fontWeight: "700",
     fontSize: 16,
-    fontWeight: '600',
   },
   applyIcon: {
     marginLeft: 8,
-  },
-  buttonText: {
-    color: '#fff',
-    fontWeight: '600',
   },
 });
