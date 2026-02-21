@@ -60,9 +60,12 @@
 
 ## 6) Recommended next priorities (high impact)
 
-1. Implement a **single API client/config** (base URL from env, common headers, interceptors).
-2. Implement **real auth session hydration** (restore user from token on app boot; loading state distinct from unauthenticated).
-3. Make **Saved** tab real and unify save source-of-truth between cards/details/profile counts.
-4. Replace mock messaging with backend-backed conversation model (list, thread, send, optimistic updates).
-5. Convert dead/misleading actions (social auth, search) into real flows or hide until implemented.
-6. Establish a small **design system pass** (color tokens, spacing scale, button hierarchy, state patterns).
+1. Implement **real auth session hydration** (restore user from token on app boot; loading state distinct from unauthenticated).
+2. Make **Saved** tab real and unify save source-of-truth between cards/details/profile counts.
+3. Replace mock messaging with backend-backed conversation model (list, thread, send, optimistic updates).
+4. Convert dead/misleading actions (social auth, search) into real flows or hide until implemented.
+5. Establish a small **design system pass** (color tokens, spacing scale, button hierarchy, state patterns).
+
+## Done
+
+1. Implemented a **single API client/config** by introducing an environment-driven API base URL and shared Axios client with auth-header interceptor, and updated major job/auth/profile/saved calls to use it.

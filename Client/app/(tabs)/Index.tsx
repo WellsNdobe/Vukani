@@ -3,6 +3,7 @@ import Header from "@/components/Header";
 import JobPost from "@/components/JobPost";
 import React, { useEffect, useState } from "react";
 import { ActivityIndicator, Alert, ScrollView, View } from "react-native";
+import { apiClient } from "@/constants/apiClient";
 
 export default function Home() {
   const [jobs, setJobs] = useState<any[]>([]);
@@ -11,9 +12,7 @@ export default function Home() {
   useEffect(() => {
     const fetchJobs = async () => {
       try {
-        const res = await fetch("http://localhost:5000/jobs"); 
-        if (!res.ok) throw new Error("Failed to fetch jobs");
-        const data = await res.json();
+        const { data } = await apiClient.get("/jobs");
         setJobs(data);
       } catch (error: any) {
         console.error(error);

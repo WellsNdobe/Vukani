@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import axios from 'axios';
+import { apiClient } from "@/constants/apiClient";
 
 type SavedJob = {
   _id: string;
@@ -16,7 +16,7 @@ export function useSavedJobs(userId: string) {
   const fetchSavedJobs = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`/api/saved/${userId}`);
+      const res = await apiClient.get(`/saved/${userId}`);
       setSavedJobs(res.data);
     } catch (err: any) {
       setError(err.message);
@@ -28,7 +28,7 @@ export function useSavedJobs(userId: string) {
   // Save job
   const saveJob = useCallback(async (jobId: string) => {
     try {
-      await axios.post(`/api/saved`, { userId, jobId });
+      await apiClient.post(`/saved`, { userId, jobId });
       setSavedJobs((prev) => [...prev, { _id: jobId, userId, jobId } as SavedJob]);
     } catch (err: any) {
       setError(err.message);
@@ -38,7 +38,7 @@ export function useSavedJobs(userId: string) {
   // Remove saved job
   const removeJob = useCallback(async (jobId: string) => {
     try {
-      await axios.delete(`/api/saved`, { data: { userId, jobId } });
+      await apiClient.delete(`/saved`, { data: { userId, jobId } });
       setSavedJobs((prev) => prev.filter((job) => job.jobId !== jobId));
     } catch (err: any) {
       setError(err.message);

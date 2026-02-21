@@ -3,6 +3,7 @@ import { useThemeColors } from "@/hooks/useThemeColor";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
+import { apiClient } from "@/constants/apiClient";
 import {
   ScrollView,
   Text,
@@ -22,7 +23,6 @@ export default function Profile() {
   const [applications, setApplications] = useState<number>(0);
   const [loading, setLoading] = useState(true);
 
-  const API_BASE = "http://localhost:5000"; // 🔹 replace with your backend URL
 
   useEffect(() => {
     if (!user?._id) return;
@@ -30,28 +30,14 @@ export default function Profile() {
    const fetchData = async () => {
   try {
   
-    const profileRes = await fetch(`${API_BASE}/profile/${user._id}`);
+    const [{ data: profileData }, { data: savedData }, { data: appsData }] = await Promise.all([
+      apiClient.get(`/profile/${user._id}`),
+      apiClient.get(`/profile/${user._id}/saved-jobs/count`),
+      apiClient.get(`/profile/${user._id}/applications/count`),
+    ]);
 
-    const profileData = await profileRes.json();
-  
     setProfile(profileData);
-
-  
-    const savedRes = await fetch(
-      `${API_BASE}/profile/${user._id}/saved-jobs/count`
-    );
- 
-    const savedData = await savedRes.json();
-
     setSavedJobs(savedData.count);
-
-
-    const appsRes = await fetch(
-      `${API_BASE}/profile/${user._id}/applications/count`
-    );
-
-    const appsData = await appsRes.json();
-
     setApplications(appsData.count);
 
   } catch (err) {

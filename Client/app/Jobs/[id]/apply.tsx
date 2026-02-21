@@ -14,6 +14,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useThemeColors } from "@/hooks/useThemeColor";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { apiClient } from "@/constants/apiClient";
 
 export default function ApplyJob() {
   const { id } = useLocalSearchParams<{ id: string }>(); // jobId
@@ -47,26 +48,14 @@ export default function ApplyJob() {
         return;
       }
 
-      const res = await fetch("http://localhost:5000/applications", {
-        method: "POST",
-        headers: { 
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          jobId: id,
-          coverLetter,
-          resume,
-        }),
+      await apiClient.post("/applications", {
+        jobId: id,
+        coverLetter,
+        resume,
       });
 
-      if (res.ok) {
-        Alert.alert("Success", "Your application has been submitted!");
-        router.back(); // Go back to job details
-      } else {
-        const error = await res.json();
-        Alert.alert("Error", error.message || "Something went wrong.");
-      }
+      Alert.alert("Success", "Your application has been submitted!");
+      router.back(); // Go back to job details
     } catch (err: any) {
       Alert.alert("Error", err.message);
     } finally {
@@ -155,7 +144,7 @@ export default function ApplyJob() {
         
         <Text style={[styles.footerNote, { color: complementaryColors.placeholder }]}>
           Your application will be reviewed by our hiring team. 
-          We'll contact you via email if you're selected for an interview.
+          We will contact you via email if you are selected for an interview.
         </Text>
       </View>
     </ScrollView>
