@@ -1,6 +1,6 @@
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import React, { useRef, useMemo } from "react";
+import React, { useEffect, useRef, useMemo } from "react";
 import { useThemeColors } from "@/hooks/useThemeColor";
 import {
   Alert,
@@ -13,7 +13,8 @@ import {
   View,
 } from "react-native";
 import { GestureHandlerRootView, Swipeable } from "react-native-gesture-handler";
-import { useSavedJobs } from "../hooks/useSavedJobs"; // <-- adjust path if needed
+import { useSavedJobs } from "../hooks/useSavedJobs";
+import { useAuth } from "@/context/authContext";
 
 export type JobPostProps = {
   _id: string;
@@ -25,7 +26,7 @@ export type JobPostProps = {
   salary?: string;
   jobType?: string;
   description?: string;
-  userId: string; // required for the hook
+  userId?: string;
   onApply?: () => void;
   onHide?: () => void;
 };
@@ -48,11 +49,17 @@ export default function JobPost(props: JobPostProps) {
 
   const swipeableRef = useRef<Swipeable | null>(null);
   const router = useRouter();
+  const { user } = useAuth();
 
-  const { savedJobs, toggleJob } = useSavedJobs(userId);
+  const effectiveUserId = userId ?? user?._id;
+  const { savedJobs, toggleJob, fetchSavedJobs } = useSavedJobs(effectiveUserId);
+
+  useEffect(() => {
+    fetchSavedJobs();
+  }, [fetchSavedJobs]);
 
   const isSaved = useMemo(
-    () => savedJobs.some((job) => job.jobId === _id),
+    () => savedJobs.some((job) => (typeof job.jobId === "string" ? job.jobId : job.jobId?._id) === _id),
     [savedJobs, _id]
   );
 
@@ -85,6 +92,10 @@ export default function JobPost(props: JobPostProps) {
           style={styles.actionButton}
           onPress={async () => {
             swipeableRef.current?.close();
+            if (!effectiveUserId) {
+              Alert.alert("Login required", "Please log in to save jobs.");
+              return;
+            }
             await toggleJob(_id, isSaved);
             Alert.alert(
               isSaved ? "Job Removed" : "Job Saved",
@@ -157,6 +168,10 @@ export default function JobPost(props: JobPostProps) {
 
   const handleSavePress = async (e: GestureResponderEvent) => {
     e.stopPropagation?.();
+    if (!effectiveUserId) {
+      Alert.alert("Login required", "Please log in to save jobs.");
+      return;
+    }
     await toggleJob(_id, isSaved);
   };
 
